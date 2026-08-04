@@ -1,0 +1,59 @@
+name: Weekly PRTS sync
+
+on:
+  schedule:
+    # Every Monday at 11:23 UTC (03:23 PST / 04:23 PDT).
+    - cron: "23 11 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  sync-build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - name: Install dependencies
+        run: npm install
+      - name: Sync PRTS data
+        run: npm run sync:prts
+      - name: Cache PRTS images locally
+        run: npm run cache:prts-assets
+      - name: Commit refreshed data and images
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/data public/assets/prts
+          if git diff --cached --quiet; then
+            echo "No PRTS changes to commit."
+          else
+            git commit -m "chore: weekly PRTS data and image sync"
+            git push
+          fi
+      - name: Build refreshed site
+        run: npm run build
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist
+      - name: Deploy refreshed site
+        id: deployment
+        uses: actions/deploy-pages@v4
+        with:
+          token: ${{ github.token }}

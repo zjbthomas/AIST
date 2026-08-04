@@ -408,3 +408,21 @@ MULTI-RUN ANALYSIS 会按每一局中同职业六星干员的普通招募顺序�
 ### 关卡区块、单元格与多链接
 
 PRTS 关卡同步以表格单元格为一个关卡单位，而不是以单个超链接为单位。比如“谤天 单座 / 二座”会保存为一条关卡记录，并在 `prtsUrls` 中保存两个链接。没有链接的关卡单元格也可以保留。添加关卡窗口会根据当前主题实际解析到的所有区块动态生成筛选按钮，例如狭路相逢、明烛试炼、特殊挑战和坎诺特的挑战。
+
+## Weekly PRTS synchronization and local image cache
+
+The repository includes two GitHub Actions workflows:
+
+- `deploy-pages.yml` builds and deploys the already-synchronized files on each push. It does not contact PRTS.
+- `weekly-prts-sync.yml` runs automatically every Monday, refreshes PRTS data, downloads new or changed operator avatars and skill icons into `public/assets/prts`, commits the changes, and deploys the refreshed site.
+
+Existing image files are reused. Only missing images or images whose source URL changed are downloaded. You can also start the weekly workflow manually from **Actions → Weekly PRTS sync → Run workflow**.
+
+Local commands:
+
+```bash
+npm run sync:prts:cached
+npm run build
+```
+
+The image cache manifest is stored at `public/assets/prts/manifest.json`. If a download fails, the original remote URL remains in `operators.json`, so the normal browser fallback icon still works.

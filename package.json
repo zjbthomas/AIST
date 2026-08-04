@@ -8,9 +8,10 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "predev": "node scripts/sync-prts.mjs",
-    "prebuild": "node scripts/sync-prts.mjs",
     "sync:prts": "node scripts/sync-prts.mjs --force",
-    "sync:stages": "node scripts/sync-prts.mjs --force --stages-only"
+    "sync:stages": "node scripts/sync-prts.mjs --force --stages-only",
+    "cache:prts-assets": "node scripts/cache-prts-assets.mjs",
+    "sync:prts:cached": "npm run sync:prts && npm run cache:prts-assets"
   },
   "dependencies": {
     "lucide-react": "latest",

@@ -10,6 +10,13 @@ const rarityColor: Record<number, string> = { 6: "#f59e0b", 5: "#facc15", 4: "#a
 const uid = () => crypto.randomUUID();
 const now = () => new Date().toISOString();
 const asset = (path: string) => `${import.meta.env.BASE_URL}${path.replace(/^\//, "")}`;
+const mediaAsset = (value?: string, fallback = "icons/operator-fallback.svg") => {
+  const url = String(value ?? "").trim();
+  if (!url) return asset(fallback);
+  if (/^(?:https?:|data:|blob:)/i.test(url)) return url;
+  if (url.startsWith(import.meta.env.BASE_URL)) return url;
+  return asset(url);
+};
 
 const PROFESSIONS = [
   { id: "VANGUARD", label: "先锋" },
@@ -642,7 +649,7 @@ function TimelineRow({row,operator,nodes,onRemove,onEdit,readOnly=false,onRowDra
 
 function OperatorAvatar({operator,state,size=58,recruitedHere=false,usedHere=false}:{operator:Operator;state?:CellState;size?:number;recruitedHere?:boolean;usedHere?:boolean}) {
   const temporary=state?.recruitType==="temporary"; const skill=state?.skill ? operator.skills.find(s=>s.index===state.skill) : undefined;
-  return <div className="avatar-ring" style={{width:size,height:size,background:temporary?`conic-gradient(#7dd3fc 0deg 180deg, ${rarityColor[operator.rarity]} 180deg 360deg)`:rarityColor[operator.rarity]}} title={`${operator.name} · ${operator.rarity}星`}><img src={operator.avatar || asset("icons/operator-fallback.svg")} alt={operator.name} onError={(e)=>{e.currentTarget.onerror=null;e.currentTarget.src=asset("icons/operator-fallback.svg");}}/>{state?.elite&&<img className="image-badge elite-image" src={asset(`icons/elite-${state.elite}.svg`)} alt={`精英化${state.elite}`}/>} {state?.deployed&&state.skill&&<img className="image-badge skill-image" src={skill?.icon||asset("icons/skill-fallback.svg")} alt={skill?.name||`技能${state.skill}`} title={skill?.name||`技能 ${state.skill}`} onError={(e)=>{e.currentTarget.src=asset("icons/skill-fallback.svg");}}/>}{recruitedHere?<span className="recruit-badge">+</span>:usedHere?<span className="used-badge" title="本关部署">✓</span>:null}</div>;
+  return <div className="avatar-ring" style={{width:size,height:size,background:temporary?`conic-gradient(#7dd3fc 0deg 180deg, ${rarityColor[operator.rarity]} 180deg 360deg)`:rarityColor[operator.rarity]}} title={`${operator.name} · ${operator.rarity}星`}><img src={mediaAsset(operator.avatar)} referrerPolicy="no-referrer" alt={operator.name} onError={(e)=>{e.currentTarget.onerror=null;e.currentTarget.src=asset("icons/operator-fallback.svg");}}/>{state?.elite&&<img className="image-badge elite-image" src={asset(`icons/elite-${state.elite}.svg`)} alt={`精英化${state.elite}`}/>} {state?.deployed&&state.skill&&<img className="image-badge skill-image" src={mediaAsset(skill?.icon, "icons/skill-fallback.svg")} referrerPolicy="no-referrer" alt={skill?.name||`技能${state.skill}`} title={skill?.name||`技能 ${state.skill}`} onError={(e)=>{e.currentTarget.src=asset("icons/skill-fallback.svg");}}/>}{recruitedHere?<span className="recruit-badge">+</span>:usedHere?<span className="used-badge" title="本关部署">✓</span>:null}</div>;
 }
 
 
@@ -687,13 +694,13 @@ function CellEditor({operator,node,row,nodes,onChange,onClose}:{operator:Operato
   const canPromoteAfter=Boolean(effective.recruitType)&&effective.elite===1;
   return <Modal title={`${operator.name} · ${node.name}`} onClose={onClose}><div className="editor-form">
     <div><div className="field-title">招募方式（只能选择一次）</div><div className="segmented"><button disabled={alreadyRecruited} className={state.recruitType==="normal"?"active":""} onClick={()=>state.recruitType==="normal"?onChange({recruitType:undefined,elite:undefined,deployed:undefined,skill:undefined,promotionAfter:undefined}):onChange({recruitType:"normal",elite:state.elite??1})}>普通招募</button><button disabled={alreadyRecruited} className={state.recruitType==="temporary"?"active":""} onClick={()=>state.recruitType==="temporary"?onChange({recruitType:undefined,elite:undefined,deployed:undefined,skill:undefined,promotionAfter:undefined}):onChange({recruitType:"temporary",elite:state.elite??1})}>临时招募</button></div>{alreadyRecruited&&<p className="hint">该干员已经在更早的节点招募，不能再次招募。</p>}</div>
-    {operator.forms?.length?<div><div className="field-title">当前形态</div><div className="segmented form-options">{operator.forms.map((form)=><button key={form.id} className={(state.formId ?? effectiveFormId)===form.id?"active":""} onClick={()=>{const next=operatorForForm(operator,form.id);onChange({formId:form.id,skill:state.deployed?next.skills[0]?.index:undefined});}}><img src={form.avatar||asset("icons/operator-fallback.svg")}/><span>{form.name}</span></button>)}</div><p className="hint">阿米娅只招募一次；每个节点可以选择当前使用的形态，技能会随形态切换。</p></div>:null}
+    {operator.forms?.length?<div><div className="field-title">当前形态</div><div className="segmented form-options">{operator.forms.map((form)=><button key={form.id} className={(state.formId ?? effectiveFormId)===form.id?"active":""} onClick={()=>{const next=operatorForForm(operator,form.id);onChange({formId:form.id,skill:state.deployed?next.skills[0]?.index:undefined});}}><img src={mediaAsset(form.avatar)} referrerPolicy="no-referrer" onError={(e)=>{e.currentTarget.onerror=null;e.currentTarget.src=asset("icons/operator-fallback.svg");}}/><span>{form.name}</span></button>)}</div><p className="hint">阿米娅只招募一次；每个节点可以选择当前使用的形态，技能会随形态切换。</p></div>:null}
     {state.recruitType&&<div><div className="field-title">招募时精英化状态</div><div className="segmented image-options"><button className={(state.elite??1)===1?"active":""} onClick={()=>onChange({elite:1})}><img src={asset("icons/elite-1.svg")}/><span>精英化一</span></button><button className={state.elite===2?"active":""} onClick={()=>onChange({elite:2,promotionAfter:undefined})}><img src={asset("icons/elite-2.svg")}/><span>直接精英化二</span></button></div><p className="hint">招募时可以直接获得精英化一或精英化二，不要求先精一再晋升。</p></div>}
     {isCombatNode&&<label className="check-row"><input type="checkbox" checked={Boolean(state.deployed)} disabled={!effective.recruitType} onChange={(e)=>onChange({deployed:e.target.checked,skill:e.target.checked?(state.skill??firstSkill):undefined,used:e.target.checked?state.used:undefined})}/> 本关编队</label>}
     {isCombatNode&&state.deployed&&<label className="check-row"><input type="checkbox" checked={Boolean(state.used)} onChange={(e)=>onChange({used:e.target.checked})}/> 本关部署</label>}
     <div><div className="field-title">当前精英化状态</div><div className="current-elite"><img src={asset(`icons/elite-${effective.elite??1}.svg`)}/><span>精英化 {effective.elite??1}</span></div><p className="hint">招募时可直接选择精一或精二；在任意节点标记晋升后，从下一个节点开始按精二记录。</p></div>
     <div><div className="field-title">{isCombatNode?"关卡结束后":"此节点之后"}</div><button className={`promotion-button ${state.promotionAfter===2?"active":""}`} disabled={!canPromoteAfter&&state.promotionAfter!==2} onClick={()=>onChange({promotionAfter:state.promotionAfter===2?undefined:2})}><img src={asset("icons/elite-2.svg")}/><span>{state.promotionAfter===2?`已标记：${isCombatNode?"本关后":"此节点后"}晋升精英化二`:`${isCombatNode?"本关后":"此节点后"}晋升精英化二`}</span></button>{effective.elite===2&&<p className="hint">该干员在此节点开始前已经是精英化二。</p>}</div>
-    {isCombatNode&&<div><div className="field-title">本关部署技能</div>{availableSkills.length?<div className="segmented image-options">{availableSkills.map(info=><button key={info.index} disabled={!effective.recruitType} className={state.deployed&&state.skill===info.index?"active":""} onClick={()=>onChange({skill:info.index,deployed:true})}><img src={info.icon||asset("icons/skill-fallback.svg")}/><span>{info.name||`技能 ${info.index}`}</span></button>)}</div>:<p className="hint">PRTS 数据显示该干员没有可选择的技能。</p>}</div>}
+    {isCombatNode&&<div><div className="field-title">本关部署技能</div>{availableSkills.length?<div className="segmented image-options">{availableSkills.map(info=><button key={info.index} disabled={!effective.recruitType} className={state.deployed&&state.skill===info.index?"active":""} onClick={()=>onChange({skill:info.index,deployed:true})}><img src={mediaAsset(info.icon,"icons/skill-fallback.svg")} referrerPolicy="no-referrer" onError={(e)=>{e.currentTarget.onerror=null;e.currentTarget.src=asset("icons/skill-fallback.svg");}}/><span>{info.name||`技能 ${info.index}`}</span></button>)}</div>:<p className="hint">PRTS 数据显示该干员没有可选择的技能。</p>}</div>}
   </div></Modal>;
 }
 
@@ -818,6 +825,23 @@ function AggregateStats({store,presets,operatorMap}:{store:TrackerStore;presets:
     ...presets.map((preset) => ({ id: `preset:${preset.id}`, label: `预设 · ${preset.name}`, run: preset.run, kind: "preset" as const })),
     ...external,
   ], [store.runs, presets, external]);
+  const knownSourceIds = useRef<Set<string>>(new Set());
+
+  // 每个本地记录、预设或导入文件首次出现时默认不参与统计。
+  useEffect(() => {
+    setExcluded((previous) => {
+      const next = new Set(previous);
+      let changed = false;
+      for (const source of sources) {
+        if (!knownSourceIds.current.has(source.id)) {
+          knownSourceIds.current.add(source.id);
+          next.add(source.id);
+          changed = true;
+        }
+      }
+      return changed ? next : previous;
+    });
+  }, [sources]);
 
   const selectedRuns = useMemo(() => sources.filter((source) => !excluded.has(source.id)).map((source) => source.run), [sources, excluded]);
   const themeOptions = useMemo(() => [...new Set(sources.map((source) => source.run.theme))], [sources]);

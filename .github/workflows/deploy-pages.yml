@@ -4,8 +4,6 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
-  schedule:
-    - cron: "23 3 * * 1"
 
 permissions:
   contents: read
@@ -28,10 +26,8 @@ jobs:
           node-version: 24
       - name: Install dependencies
         run: npm install
-      - name: Refresh PRTS data
-        run: npm run sync:prts
-      - name: Build
-        run: npm run build --ignore-scripts
+      - name: Build existing synced data
+        run: npm run build
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload Pages artifact
