@@ -1,0 +1,256 @@
+{
+  "updatedAt": "2026-08-04T00:43:56.066Z",
+  "source": "https://prts.wiki/api.php",
+  "operatorMeta": {
+    "count": 427,
+    "avatarCount": 427,
+    "revid": 335492
+  },
+  "stageMeta": {
+    "count": 618,
+    "byTheme": {
+      "傀影与猩红孤钻": 90,
+      "水月与深蓝之树": 97,
+      "探索者的银凇止境": 99,
+      "萨卡兹的无终奇语": 120,
+      "岁的界园志异": 125,
+      "沉沦者的黑流树海": 87
+    },
+    "categoriesByTheme": {
+      "傀影与猩红孤钻": [
+        {
+          "id": "ISW-NO:normal",
+          "sectionCode": "ISW-NO",
+          "sectionName": "一般作战 & 紧急作战",
+          "name": "一般作战",
+          "count": 36
+        },
+        {
+          "id": "ISW-NO:emergency",
+          "sectionCode": "ISW-NO",
+          "sectionName": "一般作战 & 紧急作战",
+          "name": "紧急作战",
+          "count": 36
+        },
+        {
+          "id": "ISW-DF:default",
+          "sectionCode": "ISW-DF",
+          "sectionName": "险路恶敌",
+          "name": "险路恶敌",
+          "count": 9
+        },
+        {
+          "id": "ISW-DU:default",
+          "sectionCode": "ISW-DU",
+          "sectionName": "鸭爵表演",
+          "name": "鸭爵表演",
+          "count": 4
+        },
+        {
+          "id": "ISW-SP:default",
+          "sectionCode": "ISW-SP",
+          "sectionName": "特殊挑战",
+          "name": "特殊挑战",
+          "count": 5
+        }
+      ],
+      "水月与深蓝之树": [
+        {
+          "id": "ISW-NO:normal",
+          "sectionCode": "ISW-NO",
+          "sectionName": "一般作战 & 紧急作战",
+          "name": "一般作战",
+          "count": 37
+        },
+        {
+          "id": "ISW-NO:emergency",
+          "sectionCode": "ISW-NO",
+          "sectionName": "一般作战 & 紧急作战",
+          "name": "紧急作战",
+          "count": 37
+        },
+        {
+          "id": "ISW-NO & ISW-DF:default",
+          "sectionCode": "ISW-NO & ISW-DF",
+          "sectionName": "险路恶敌",
+          "name": "险路恶敌",
+          "count": 13
+        },
+        {
+          "id": "ISW-DU:default",
+          "sectionCode": "ISW-DU",
+          "sectionName": "鸭爵与雇员",
+          "name": "鸭爵与雇员",
+          "count": 5
+        },
+        {
+          "id": "ISW-SP:default",
+          "sectionCode": "ISW-SP",
+          "sectionName": "特殊挑战",
+          "name": "特殊挑战",
+          "count": 5
+        }
+      ],
+      "探索者的银凇止境": [
+        {
+          "id": "ISW-NO:normal",
+          "sectionCode": "ISW-NO",
+          "sectionName": "一般作战 & 紧急作战",
+          "name": "一般作战",
+          "count": 36
+        },
+        {
+          "id": "ISW-NO:emergency",
+          "sectionCode": "ISW-NO",
+          "sectionName": "一般作战 & 紧急作战",
+          "name": "紧急作战",
+          "count": 36
+        },
+        {
+          "id": "ISW-NO & ISW-DF:default",
+          "sectionCode": "ISW-NO & ISW-DF",
+          "sectionName": "险路恶敌",
+          "name": "险路恶敌",
+          "count": 14
+        },
+        {
+          "id": "ISW-DF:default",
+          "sectionCode": "ISW-DF",
+          "sectionName": "鸭爵与雇员",
+          "name": "鸭爵与雇员",
+          "count": 4
+        },
+        {
+          "id": "ISW-SP:default",
+          "sectionCode": "ISW-SP",
+          "sectionName": "特殊挑战",
+          "name": "特殊挑战",
+          "count": 9
+        }
+      ],
+      "萨卡兹的无终奇语": [
+        {
+          "id": "ISW-NO:normal",
+          "sectionCode": "ISW-NO",
+          "sectionName": "一般作战 & 紧急作战",
+          "name": "一般作战",
+          "count": 43
+        },
+        {
+          "id": "ISW-NO:emergency",
+          "sectionCode": "ISW-NO",
+          "sectionName": "一般作战 & 紧急作战",
+          "name": "紧急作战",
+          "count": 43
+        },
+        {
+          "id": "ISW-NO & ISW-DF:default",
+          "sectionCode": "ISW-NO & ISW-DF",
+          "sectionName": "险路恶敌",
+          "name": "险路恶敌",
+          "count": 21
+        },
+        {
+          "id": "ISW-SP:default",
+          "sectionCode": "ISW-SP",
+          "sectionName": "鸭爵与雇员",
+          "name": "鸭爵与雇员",
+          "count": 9
+        },
+        {
+          "id": "ISW-NO:default",
+          "sectionCode": "ISW-NO",
+          "sectionName": "狭路相逢",
+          "name": "狭路相逢",
+          "count": 4
+        }
+      ],
+      "岁的界园志异": [
+        {
+          "id": "ISW-NO:normal",
+          "sectionCode": "ISW-NO",
+          "sectionName": "一般作战 & 紧急作战",
+          "name": "一般作战",
+          "count": 36
+        },
+        {
+          "id": "ISW-NO:emergency",
+          "sectionCode": "ISW-NO",
+          "sectionName": "一般作战 & 紧急作战",
+          "name": "紧急作战",
+          "count": 36
+        },
+        {
+          "id": "ISW-NO:default",
+          "sectionCode": "ISW-NO",
+          "sectionName": "祸乱",
+          "name": "祸乱",
+          "count": 21
+        },
+        {
+          "id": "ISW-NO & ISW-DF:default",
+          "sectionCode": "ISW-NO & ISW-DF",
+          "sectionName": "险路恶敌",
+          "name": "险路恶敌",
+          "count": 16
+        },
+        {
+          "id": "ISW-SP:default",
+          "sectionCode": "ISW-SP",
+          "sectionName": "鸭爵与雇员",
+          "name": "鸭爵与雇员",
+          "count": 16
+        }
+      ],
+      "沉沦者的黑流树海": [
+        {
+          "id": "ISW-NO:normal",
+          "sectionCode": "ISW-NO",
+          "sectionName": "一般作战 & 紧急作战",
+          "name": "一般作战",
+          "count": 31
+        },
+        {
+          "id": "ISW-NO:emergency",
+          "sectionCode": "ISW-NO",
+          "sectionName": "一般作战 & 紧急作战",
+          "name": "紧急作战",
+          "count": 31
+        },
+        {
+          "id": "ISW-NO & ISW-DF:default",
+          "sectionCode": "ISW-NO & ISW-DF",
+          "sectionName": "险路恶敌",
+          "name": "险路恶敌",
+          "count": 19
+        },
+        {
+          "id": "ISW-NO:default",
+          "sectionCode": "ISW-NO",
+          "sectionName": "鸭爵与雇员",
+          "name": "鸭爵与雇员",
+          "count": 6
+        }
+      ]
+    },
+    "revisions": {
+      "傀影与猩红孤钻": 409096,
+      "水月与深蓝之树": 409098,
+      "探索者的银凇止境": 409099,
+      "萨卡兹的无终奇语": 409100,
+      "岁的界园志异": 410917,
+      "沉沦者的黑流树海": 415745
+    }
+  },
+  "squadMeta": {
+    "count": 95,
+    "byTheme": {
+      "傀影与猩红孤钻": 10,
+      "水月与深蓝之树": 14,
+      "探索者的银凇止境": 15,
+      "萨卡兹的无终奇语": 20,
+      "岁的界园志异": 21,
+      "沉沦者的黑流树海": 15
+    }
+  }
+}

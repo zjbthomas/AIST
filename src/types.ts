@@ -7,6 +7,10 @@ export type TimelineNode = {
   floor: number;
   type: NodeType;
   stageId?: string;
+  categoryId?: string;
+  categoryName?: string;
+  sectionCode?: string;
+  sectionName?: string;
   name: string;
 };
 
@@ -14,6 +18,7 @@ export type CellState = {
   recruitType?: "normal" | "temporary";
   deployed?: boolean;
   elite?: Elite;
+  promotionAfter?: 2;
   skill?: Skill;
 };
 

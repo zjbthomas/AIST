@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Download, ExternalLink, FolderOpen, Plus, RefreshCw, Save, Trash2, Upload, X } from "lucide-react";
+import { pinyin } from "pinyin-pro";
+import { Copy, Download, ExternalLink, FolderOpen, Library, Plus, Trash2, Upload, X } from "lucide-react";
 import { fallbackOperators, type Operator } from "./data/operators";
 import { squads as fallbackSquads, stages as fallbackStages, themes, type Stage } from "./data/stages";
 import type { CellState, Elite, RunOperator, RunState, Skill, TimelineNode, TrackerStore } from "./types";
@@ -9,6 +10,57 @@ const rarityColor: Record<number, string> = { 6: "#f59e0b", 5: "#facc15", 4: "#a
 const uid = () => crypto.randomUUID();
 const now = () => new Date().toISOString();
 const asset = (path: string) => `${import.meta.env.BASE_URL}${path.replace(/^\//, "")}`;
+
+const PROFESSIONS = [
+  { id: "VANGUARD", label: "先锋" },
+  { id: "GUARD", label: "近卫" },
+  { id: "DEFENDER", label: "重装" },
+  { id: "SNIPER", label: "狙击" },
+  { id: "CASTER", label: "术师" },
+  { id: "MEDIC", label: "医疗" },
+  { id: "SUPPORTER", label: "辅助" },
+  { id: "SPECIALIST", label: "特种" },
+ ] as const;
+
+const PROFESSION_ALIASES: Record<string, string> = {
+  PIONEER: "VANGUARD", VANGUARD: "VANGUARD", 先锋: "VANGUARD",
+  WARRIOR: "GUARD", GUARD: "GUARD", 近卫: "GUARD",
+  TANK: "DEFENDER", DEFENDER: "DEFENDER", 重装: "DEFENDER",
+  SNIPER: "SNIPER", 狙击: "SNIPER",
+  CASTER: "CASTER", 术师: "CASTER",
+  MEDIC: "MEDIC", 医疗: "MEDIC",
+  SUPPORT: "SUPPORTER", SUPPORTER: "SUPPORTER", 辅助: "SUPPORTER",
+  SPECIAL: "SPECIALIST", SPECIALIST: "SPECIALIST", 特种: "SPECIALIST",
+};
+const normalizeProfession = (value?: string) => PROFESSION_ALIASES[String(value ?? "").trim()] ?? PROFESSION_ALIASES[String(value ?? "").trim().toUpperCase()] ?? String(value ?? "").trim().toUpperCase();
+
+function operatorSearchText(operator: Operator) {
+  const full = pinyin(operator.name, { toneType: "none", type: "array" }).join("");
+  const spaced = pinyin(operator.name, { toneType: "none", type: "array" }).join(" ");
+  const initials = pinyin(operator.name, { pattern: "first", toneType: "none", type: "array" }).join("");
+  return `${operator.name} ${full} ${spaced} ${initials}`.toLowerCase();
+}
+
+type PresetSummary = {
+  id: string;
+  name: string;
+  description?: string;
+  theme: string;
+  squad?: string;
+  author?: string;
+  event?: string;
+  date?: string;
+  tags?: string[];
+  file: string;
+};
+
+type LoadedPreset = PresetSummary & { run: RunState };
+
+function cloneRun(source: RunState, suffix = " - 副本"): RunState {
+  const cloned = structuredClone(source);
+  const createdAt = now();
+  return { ...cloned, id: uid(), name: `${source.name}${suffix}`, createdAt, updatedAt: createdAt };
+}
 
 function createRun(name = `新记录 ${new Date().toLocaleString("zh-CN")}`): RunState {
   return {
@@ -34,18 +86,30 @@ function App() {
   const [dataStatus, setDataStatus] = useState("正在检查 PRTS 数据…");
   const [showOperatorPicker, setShowOperatorPicker] = useState(false);
   const [showStagePicker, setShowStagePicker] = useState(false);
+  const [stageCategory, setStageCategory] = useState<string>("all");
+  const [stageFloor, setStageFloor] = useState<number>(1);
   const [showRunManager, setShowRunManager] = useState(false);
+  const [showPresetLibrary, setShowPresetLibrary] = useState(false);
+  const [presets, setPresets] = useState<LoadedPreset[]>([]);
+  const [presetStatus, setPresetStatus] = useState("正在读取预设记录…");
+  const [previewPresetId, setPreviewPresetId] = useState<string | null>(null);
   const [editingCell, setEditingCell] = useState<{ operatorId: string; nodeId: string } | null>(null);
   const [search, setSearch] = useState("");
   const [operatorRarity, setOperatorRarity] = useState<0 | 1 | 2 | 3 | 4 | 5 | 6>(0);
+  const [operatorProfession, setOperatorProfession] = useState<string>("all");
   const [operatorAvailability, setOperatorAvailability] = useState<"all" | "available" | "added">("available");
   const [operatorPickerSort, setOperatorPickerSort] = useState<"rarity-desc" | "rarity-asc" | "name-asc">("rarity-desc");
   const [sortBy, setSortBy] = useState<"recruit" | "rarity" | "deploy">("recruit");
   const importRef = useRef<HTMLInputElement>(null);
 
-  const run = store.runs.find((item) => item.id === store.activeRunId) ?? store.runs[0];
+  const localRun = store.runs.find((item) => item.id === store.activeRunId) ?? store.runs[0];
+  const previewPreset = presets.find((item) => item.id === previewPresetId);
+  const run = previewPreset?.run ?? localRun;
+  const isPresetPreview = Boolean(previewPreset);
+  const hasTimelineData = run.operators.length > 0 || run.nodes.some((node) => node.type !== "initial");
 
   useEffect(() => localStorage.setItem(STORAGE_KEY, JSON.stringify(store)), [store]);
+  useEffect(() => { setStageCategory("all"); setStageFloor(1); }, [run.theme]);
   useEffect(() => {
     Promise.all([
       fetch(asset("data/operators.json"), { cache: "no-cache" }).then((r) => r.ok ? r.json() : Promise.reject()),
@@ -53,11 +117,42 @@ function App() {
       fetch(asset("data/squads.json"), { cache: "no-cache" }).then((r) => r.ok ? r.json() : []),
       fetch(asset("data/manifest.json"), { cache: "no-cache" }).then((r) => r.ok ? r.json() : null),
     ]).then(([opData, stageData, squadData, manifest]) => {
-      if (Array.isArray(opData) && opData.length) setOperators(opData);
-      if (Array.isArray(stageData) && stageData.length) setStages(stageData);
+      if (Array.isArray(opData) && opData.length) setOperators(opData.map((op: Operator) => ({ ...op, profession: normalizeProfession(op.profession) })));
+      if (Array.isArray(stageData) && stageData.length) setStages(stageData.map((stage: Stage & { battleType?: string }) => ({
+        ...stage,
+        sectionCode: stage.sectionCode ?? "LEGACY",
+        sectionName: stage.sectionName ?? "旧版作战",
+        categoryId: stage.categoryId ?? `LEGACY:${stage.battleType ?? "normal"}`,
+        categoryName: stage.categoryName ?? ({ normal: "一般作战", emergency: "紧急作战", boss: "险路恶敌", special: "特殊作战" }[stage.battleType ?? "normal"] ?? "旧版作战"),
+        variant: stage.variant ?? stage.battleType ?? "default",
+      })));
       if (Array.isArray(squadData) && squadData.length) setSquads(squadData);
       setDataStatus(manifest?.updatedAt ? `PRTS 数据：${new Date(manifest.updatedAt).toLocaleString("zh-CN")}` : "已加载本地 PRTS 数据");
     }).catch(() => setDataStatus("使用内置数据；下次启动会再次检查"));
+  }, []);
+
+  useEffect(() => {
+    fetch(asset("presets/index.json"), { cache: "no-cache" })
+      .then((response) => response.ok ? response.json() : Promise.reject(new Error("找不到预设索引")))
+      .then(async (index: PresetSummary[]) => {
+        if (!Array.isArray(index)) throw new Error("预设索引格式错误");
+        const loaded: LoadedPreset[] = [];
+        for (const item of index) {
+          try {
+            const response = await fetch(asset(`presets/${item.file}`), { cache: "no-cache" });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const parsed = await response.json() as RunState | TrackerStore;
+            const run = "runs" in parsed ? parsed.runs[0] : parsed;
+            if (!run?.id || !Array.isArray(run.nodes) || !Array.isArray(run.operators)) throw new Error("记录格式错误");
+            loaded.push({ ...item, run });
+          } catch (error) {
+            console.warn(`无法加载预设 ${item.name}:`, error);
+          }
+        }
+        setPresets(loaded);
+        setPresetStatus(index.length ? `已加载 ${loaded.length}/${index.length} 个预设` : "暂未配置预设记录");
+      })
+      .catch(() => setPresetStatus("暂未配置预设记录"));
   }, []);
 
   const operatorMap = useMemo(() => Object.fromEntries(operators.map((op) => [op.id, op])), [operators]);
@@ -65,7 +160,9 @@ function App() {
   const pickerOperators = useMemo(() => {
     const added = new Set(run.operators.map((row) => row.operatorId));
     const rows = operators.filter((op) => {
-      if (search && !op.name.toLocaleLowerCase("zh-CN").includes(search.toLocaleLowerCase("zh-CN"))) return false;
+      const normalizedSearch = search.trim().toLowerCase().replace(/\s+/g, "");
+      if (normalizedSearch && !operatorSearchText(op).replace(/\s+/g, "").includes(normalizedSearch)) return false;
+      if (operatorProfession !== "all" && normalizeProfession(op.profession) !== operatorProfession) return false;
       if (operatorRarity && op.rarity !== operatorRarity) return false;
       if (operatorAvailability === "available" && added.has(op.id)) return false;
       if (operatorAvailability === "added" && !added.has(op.id)) return false;
@@ -77,7 +174,16 @@ function App() {
       return a.name.localeCompare(b.name, "zh-CN");
     });
     return rows;
-  }, [operators, run.operators, search, operatorRarity, operatorAvailability, operatorPickerSort]);
+  }, [operators, run.operators, search, operatorProfession, operatorRarity, operatorAvailability, operatorPickerSort]);
+  const stageCategories = useMemo(() => {
+    const map = new Map<string, { id: string; name: string; sectionCode: string; sectionName: string; count: number }>();
+    for (const stage of stages.filter((item) => item.theme === run.theme)) {
+      const existing = map.get(stage.categoryId);
+      if (existing) existing.count += 1;
+      else map.set(stage.categoryId, { id: stage.categoryId, name: stage.categoryName, sectionCode: stage.sectionCode, sectionName: stage.sectionName, count: 1 });
+    }
+    return [...map.values()];
+  }, [stages, run.theme]);
   const sortedRows = useMemo(() => {
     const rows = [...run.operators];
     if (sortBy === "rarity") rows.sort((a, b) => (operatorMap[b.operatorId]?.rarity ?? 0) - (operatorMap[a.operatorId]?.rarity ?? 0));
@@ -88,14 +194,15 @@ function App() {
     const groups: Array<{ floor: number; count: number }> = [];
     for (const node of run.nodes) {
       const last = groups.at(-1);
-      if (last?.floor === node.floor) last.count++;
+      if (last && last.floor === node.floor) last.count++;
       else groups.push({ floor: node.floor, count: 1 });
     }
     return groups;
   }, [run.nodes]);
 
   function updateRun(updater: (current: RunState) => RunState) {
-    setStore((prev) => ({ ...prev, runs: prev.runs.map((item) => item.id === run.id ? { ...updater(item), updatedAt: now() } : item) }));
+    if (isPresetPreview) return;
+    setStore((prev) => ({ ...prev, runs: prev.runs.map((item) => item.id === localRun.id ? { ...updater(item), updatedAt: now() } : item) }));
   }
   function addOperator(op: Operator) {
     if (run.operators.some((row) => row.operatorId === op.id)) return;
@@ -103,13 +210,33 @@ function App() {
   }
   function addStage(stageId: string) {
     const stage = stages.find((item) => item.id === stageId); if (!stage) return;
+    const floor = stage.floor || stageFloor;
     updateRun((current) => {
-      const node = { id: uid(), floor: stage.floor, type: "combat" as const, stageId: stage.id, name: stage.name };
+      const node = {
+        id: uid(), floor, type: "combat" as const, stageId: stage.id,
+        categoryId: stage.categoryId, categoryName: stage.categoryName,
+        sectionCode: stage.sectionCode, sectionName: stage.sectionName,
+        name: stage.name,
+      };
       const next = [...current.nodes];
       let insertAt = next.length;
-      for (let i = 1; i < next.length; i++) if (next[i].floor > stage.floor) { insertAt = i; break; }
+      for (let i = 1; i < next.length; i++) if (next[i].floor > floor) { insertAt = i; break; }
       next.splice(insertAt, 0, node);
-      return { ...current, nodes: next };
+
+      // Carry the previous node's battle setup into the newly added stage.
+      // Only per-battle choices are inherited: deployment and skill. One-time
+      // events such as recruitment, temporary recruitment and promotion are not.
+      const previousNode = insertAt > 0 ? next[insertAt - 1] : undefined;
+      const operators = current.operators.map((row) => {
+        if (!previousNode) return row;
+        const previous = row.cells[previousNode.id] ?? {};
+        const inherited: CellState = previous.deployed
+          ? { deployed: true, skill: previous.skill }
+          : { deployed: false };
+        return { ...row, cells: { ...row.cells, [node.id]: inherited } };
+      });
+
+      return { ...current, nodes: next, operators };
     });
     setShowStagePicker(false);
   }
@@ -126,6 +253,17 @@ function App() {
       return { ...row, cells: { ...row.cells, [nodeId]: { ...previous, ...patch } } };
     }) }));
   }
+  function clearOperatorsAndStages() {
+    if (isPresetPreview || !hasTimelineData) return;
+    if (!window.confirm("确定清除当前记录中已添加的全部干员和关卡吗？此操作不会删除记录名称、主题和分队。")) return;
+    updateRun((current) => ({
+      ...current,
+      nodes: current.nodes.filter((node) => node.type === "initial"),
+      operators: [],
+    }));
+    setEditingCell(null);
+  }
+
   function exportStore() {
     const blob = new Blob([JSON.stringify(store, null, 2)], { type: "application/json" });
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `arknights-is-records-${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(a.href);
@@ -137,39 +275,52 @@ function App() {
       setStore(parsed); setShowRunManager(false);
     }).catch((error) => alert(`读取失败：${error.message}`));
   }
+  function copyPreset(preset: LoadedPreset) {
+    const copied = cloneRun(preset.run);
+    setStore((current) => ({ ...current, activeRunId: copied.id, runs: [...current.runs, copied] }));
+    setPreviewPresetId(null);
+    setShowPresetLibrary(false);
+  }
 
   return <div className="app-shell">
     <header className="topbar">
       <div><div className="eyebrow">ARKNIGHTS ROGUELIKE</div><h1>集成战略记录器</h1><div className="data-status">{dataStatus}</div></div>
       <div className="top-actions">
         <button className="ghost-button" onClick={() => setShowRunManager(true)}><FolderOpen size={16}/> 记录</button>
+        <button className="ghost-button" onClick={() => setShowPresetLibrary(true)}><Library size={16}/> 预设</button>
         <button className="ghost-button" onClick={exportStore}><Download size={16}/> 导出</button>
         <button className="ghost-button" onClick={() => importRef.current?.click()}><Upload size={16}/> 导入</button>
         <input ref={importRef} hidden type="file" accept="application/json" onChange={(e) => e.target.files?.[0] && importStore(e.target.files[0])}/>
       </div>
     </header>
 
+    {isPresetPreview&&previewPreset&&<section className="preset-preview-banner panel"><div><strong>只读预设：{previewPreset.name}</strong><span>{previewPreset.description || "此记录来自网站预设，不会修改你的本地数据。"}</span></div><div className="top-actions"><button onClick={()=>copyPreset(previewPreset)}><Copy size={16}/> 复制到我的记录</button><button className="ghost-button" onClick={()=>setPreviewPresetId(null)}>退出预览</button></div></section>}
+
     <section className="toolbar panel">
-      <label>记录名称<input value={run.name} onChange={(e) => updateRun((r) => ({ ...r, name: e.target.value }))}/></label>
-      <label>集成战略<select value={run.theme} onChange={(e) => { const theme = e.target.value; const firstSquad = squads.find((item) => item.theme === theme)?.name ?? fallbackSquads[0]; updateRun((r) => ({ ...r, theme, squad: firstSquad })); }}>{themes.map((x) => <option key={x}>{x}</option>)}</select></label>
-      <label>分队<select value={run.squad} onChange={(e) => updateRun((r) => ({ ...r, squad: e.target.value }))}>{availableSquads.map((x) => <option key={x.id} value={x.name}>{x.name}</option>)}</select></label>
+      <label>记录名称<input disabled={isPresetPreview} value={run.name} onChange={(e) => updateRun((r) => ({ ...r, name: e.target.value }))}/></label>
+      <label>集成战略<select disabled={isPresetPreview || hasTimelineData} title={hasTimelineData ? "已有干员或关卡时不能更改集成战略；请先一键清除" : undefined} value={run.theme} onChange={(e) => { const theme = e.target.value; const firstSquad = squads.find((item) => item.theme === theme)?.name ?? fallbackSquads[0]; updateRun((r) => ({ ...r, theme, squad: firstSquad })); }}>{themes.map((x) => <option key={x}>{x}</option>)}</select></label>
+      <label>分队<select disabled={isPresetPreview} value={run.squad} onChange={(e) => updateRun((r) => ({ ...r, squad: e.target.value }))}>{availableSquads.map((x) => <option key={x.id} value={x.name}>{x.name}</option>)}</select></label>
       <label>行排序<select value={sortBy} onChange={(e) => setSortBy(e.target.value as typeof sortBy)}><option value="recruit">添加顺序</option><option value="rarity">星级降序</option><option value="deploy">出场次数</option></select></label>
-      <div className="toolbar-actions"><button onClick={() => setShowOperatorPicker(true)}><Plus size={16}/> 添加干员</button><button onClick={() => setShowStagePicker(true)}><Plus size={16}/> 添加关卡</button></div>
+      <div className="toolbar-actions"><button disabled={isPresetPreview} onClick={() => setShowOperatorPicker(true)}><Plus size={16}/> 添加干员</button><button disabled={isPresetPreview} onClick={() => setShowStagePicker(true)}><Plus size={16}/> 添加关卡</button><button className="danger-button" disabled={isPresetPreview || !hasTimelineData} onClick={clearOperatorsAndStages}><Trash2 size={16}/> 一键清除干员和关卡</button></div>
     </section>
 
     <section className="timeline-panel panel"><div className="timeline-scroll"><div className="timeline-grid" style={{gridTemplateColumns:`210px repeat(${run.nodes.length}, 122px)`}}>
       <div className="corner floor-header sticky-left">干员 / 楼层</div>
       {floorGroups.map((g,i)=><div key={`${g.floor}-${i}`} className="floor-header" style={{gridColumn:`span ${g.count}`}}>{g.floor===0?"初始":`第 ${g.floor} 层`}</div>)}
       <div className="corner node-header sticky-left">节点</div>
-      {run.nodes.map((node)=><div className="node-header" key={node.id}><div className="node-title">{node.name}</div><div className="node-actions">{node.stageId&&<a href={stages.find(s=>s.id===node.stageId)?.prtsUrl} target="_blank" rel="noreferrer"><ExternalLink size={14}/></a>}{node.type!=="initial"&&<button onClick={()=>removeNode(node.id)}><Trash2 size={14}/></button>}</div></div>)}
-      {sortedRows.map((row)=>{const op=operatorMap[row.operatorId]; return op?<TimelineRow key={row.operatorId} row={row} operator={op} nodes={run.nodes} onRemove={()=>updateRun(r=>({...r,operators:r.operators.filter(x=>x.operatorId!==row.operatorId)}))} onEdit={(nodeId)=>setEditingCell({operatorId:row.operatorId,nodeId})}/>:null;})}
+      {run.nodes.map((node)=><div className="node-header" key={node.id}><div className="node-title">{node.name}</div>{node.type==="combat"&&<span className="battle-type-badge">{node.categoryName??stages.find(s=>s.id===node.stageId)?.categoryName??"作战"}</span>}<div className="node-actions">{node.stageId&&<a href={stages.find(s=>s.id===node.stageId)?.prtsUrl} target="_blank" rel="noreferrer"><ExternalLink size={14}/></a>}{node.type!=="initial"&&!isPresetPreview&&<button onClick={()=>removeNode(node.id)}><Trash2 size={14}/></button>}</div></div>)}
+      {sortedRows.map((row)=>{const op=operatorMap[row.operatorId]; return op?<TimelineRow key={row.operatorId} row={row} operator={op} nodes={run.nodes} onRemove={()=>updateRun(r=>({...r,operators:r.operators.filter(x=>x.operatorId!==row.operatorId)}))} onEdit={(nodeId)=>{if(!isPresetPreview)setEditingCell({operatorId:row.operatorId,nodeId});}} readOnly={isPresetPreview}/>:null;})}
     </div></div></section>
     <Stats run={run} operatorMap={operatorMap}/>
-    <AggregateStats store={store} operatorMap={operatorMap}/>
+    <AggregateStats store={store} presets={presets} operatorMap={operatorMap}/>
 
     {showOperatorPicker&&<Modal title="添加干员" onClose={()=>setShowOperatorPicker(false)}>
+      <div className="profession-filter" aria-label="按职业筛选">
+        <button className={operatorProfession === "all" ? "active" : ""} onClick={() => setOperatorProfession("all")}>全部</button>
+        {PROFESSIONS.map((profession) => <button key={profession.id} className={operatorProfession === profession.id ? "active" : ""} onClick={() => setOperatorProfession(profession.id)}>{profession.label}</button>)}
+      </div>
       <div className="picker-controls">
-        <input autoFocus className="search-input" placeholder="搜索干员名称" value={search} onChange={(e)=>setSearch(e.target.value)}/>
+        <input autoFocus className="search-input" placeholder="搜索中文、拼音或首字母，例如：棘刺 / jici / jc" value={search} onChange={(e)=>setSearch(e.target.value)}/>
         <select value={operatorRarity} onChange={(e)=>setOperatorRarity(Number(e.target.value) as 0|1|2|3|4|5|6)} aria-label="按星级筛选">
           <option value={0}>全部星级</option>{[6,5,4,3,2,1].map(r=><option value={r} key={r}>{r} 星</option>)}
         </select>
@@ -183,35 +334,60 @@ function App() {
       <div className="picker-summary">显示 {pickerOperators.length} / {operators.length} 名干员</div>
       <div className="picker-grid">{pickerOperators.map(op=><button className="picker-item" key={op.id} onClick={()=>addOperator(op)} disabled={run.operators.some(r=>r.operatorId===op.id)}><OperatorAvatar operator={op} size={62}/><span>{op.name}</span><small>{op.rarity}★{run.operators.some(r=>r.operatorId===op.id)?" · 已添加":""}</small></button>)}</div>
     </Modal>}
-    {showStagePicker&&<Modal title="添加关卡" onClose={()=>setShowStagePicker(false)}><div className="stage-list">{stages.filter(s=>s.theme===run.theme).sort((a,b)=>a.floor-b.floor||a.name.localeCompare(b.name,"zh-CN")).map(s=><button key={s.id} className="stage-item" onClick={()=>addStage(s.id)}><span>第 {s.floor} 层</span><strong>{s.name}</strong></button>)}</div></Modal>}
+    {showStagePicker&&<Modal title="添加关卡" onClose={()=>setShowStagePicker(false)}>
+      {stages.some(stage=>stage.theme===run.theme&&stage.floor===0)&&<div className="stage-floor-warning"><strong>部分关卡的楼层无法从 PRTS 自动识别。</strong><span>这些关卡会标记为“自选”，请使用下方楼层按钮指定它们所在的层数。</span></div>}
+      <div className="stage-floor-filters" aria-label="选择楼层">{[1,2,3,4,5,6].map(floor=><button key={floor} className={stageFloor===floor?"active":""} onClick={()=>setStageFloor(floor)}>第 {floor} 层</button>)}</div>
+      <div className="stage-type-filters">
+        <button className={stageCategory==="all"?"active":""} onClick={()=>setStageCategory("all")}>全部类别</button>
+        {stageCategories.map(category=><button key={category.id} className={stageCategory===category.id?"active":""} onClick={()=>setStageCategory(category.id)} title={`${category.sectionCode} · ${category.sectionName}`}>{category.name}<small>{category.count}</small></button>)}
+      </div>
+      <div className="stage-list">{stages
+        .filter(s=>s.theme===run.theme&&(stageCategory==="all"||s.categoryId===stageCategory)&&(s.floor===0||s.floor===stageFloor))
+        .sort((a,b)=>a.categoryName.localeCompare(b.categoryName,"zh-CN")||a.name.localeCompare(b.name,"zh-CN"))
+        .map(s=><button key={s.id} className="stage-item" onClick={()=>addStage(s.id)}><span>{s.floor?`第 ${s.floor} 层`:`第 ${stageFloor} 层（自选）`} · {s.categoryName}</span><strong>{s.name}</strong><small>{s.sectionCode} · {s.sectionName}</small></button>)}</div>
+    </Modal>}
     {editingCell&&<CellEditor operator={operatorMap[editingCell.operatorId]} node={run.nodes.find(n=>n.id===editingCell.nodeId)!} row={run.operators.find(r=>r.operatorId===editingCell.operatorId)!} nodes={run.nodes} onChange={(patch)=>updateCell(editingCell.operatorId,editingCell.nodeId,patch)} onClose={()=>setEditingCell(null)}/>} 
-    {showRunManager&&<RunManager store={store} onClose={()=>setShowRunManager(false)} onSelect={(id)=>setStore(s=>({...s,activeRunId:id}))} onCreate={()=>{const newRun=createRun();setStore(s=>({...s,activeRunId:newRun.id,runs:[...s.runs,newRun]}));}} onDelete={(id)=>setStore(s=>{if(s.runs.length===1)return s;const runs=s.runs.filter(r=>r.id!==id);return{...s,runs,activeRunId:s.activeRunId===id?runs[0].id:s.activeRunId};})}/>} 
+    {showPresetLibrary&&<PresetLibrary presets={presets} status={presetStatus} onClose={()=>setShowPresetLibrary(false)} onPreview={(id)=>{setPreviewPresetId(id);setShowPresetLibrary(false);}} onCopy={copyPreset}/>}
+    {showRunManager&&<RunManager store={store} onClose={()=>setShowRunManager(false)} onSelect={(id)=>{setPreviewPresetId(null);setStore(s=>({...s,activeRunId:id}));}} onCreate={()=>{const newRun=createRun();setStore(s=>({...s,activeRunId:newRun.id,runs:[...s.runs,newRun]}));}} onDelete={(id)=>setStore(s=>{if(s.runs.length===1)return s;const runs=s.runs.filter(r=>r.id!==id);return{...s,runs,activeRunId:s.activeRunId===id?runs[0].id:s.activeRunId};})}/>} 
   </div>;
 }
 
-function TimelineRow({row,operator,nodes,onRemove,onEdit}:{row:RunOperator;operator:Operator;nodes:TimelineNode[];onRemove:()=>void;onEdit:(id:string)=>void}) {
-  return <><div className="operator-label sticky-left"><OperatorAvatar operator={operator} size={50}/><div className="operator-text"><a href={operator.prtsUrl} target="_blank" rel="noreferrer">{operator.name}</a><span>{operator.rarity}★ · 出场 {countDeploys(row)}</span></div><button onClick={onRemove}><X size={15}/></button></div>{nodes.map((node,index)=>{const state=row.cells[node.id]??{};const recruitedIndex=nodes.findIndex(n=>Boolean(row.cells[n.id]?.recruitType));const owned=recruitedIndex>=0&&index>=recruitedIndex;const effective=resolveEffectiveState(row,nodes,index);return <button key={node.id} className={`timeline-cell ${owned?"owned":""}`} onClick={()=>onEdit(node.id)}>{owned&&<span className="connector"/>}{(state.recruitType||state.deployed)&&<OperatorAvatar operator={operator} state={{...state,elite:effective.elite,recruitType:effective.recruitType}} size={68}/>}</button>;})}</>;
+function TimelineRow({row,operator,nodes,onRemove,onEdit,readOnly=false}:{row:RunOperator;operator:Operator;nodes:TimelineNode[];onRemove:()=>void;onEdit:(id:string)=>void;readOnly?:boolean}) {
+  return <><div className="operator-label sticky-left"><OperatorAvatar operator={operator} size={50}/><div className="operator-text"><a href={operator.prtsUrl} target="_blank" rel="noreferrer">{operator.name}</a><span>{operator.rarity}★ · 出场 {countDeploys(row)}</span></div>{!readOnly&&<button onClick={onRemove}><X size={15}/></button>}</div>{nodes.map((node,index)=>{const state=row.cells[node.id]??{};const recruitedIndex=nodes.findIndex(n=>Boolean(row.cells[n.id]?.recruitType));const owned=recruitedIndex>=0&&index>=recruitedIndex;const effective=resolveEffectiveState(row,nodes,index);return <button key={node.id} className={`timeline-cell ${owned?"owned":""} ${readOnly?"readonly":""}`} onClick={()=>onEdit(node.id)}>{owned&&<span className="connector"/>}{(state.recruitType||state.deployed)&&<OperatorAvatar operator={operator} state={{...state,elite:effective.elite,recruitType:effective.recruitType}} recruitedHere={Boolean(state.recruitType)} size={68}/>} {state.promotionAfter===2&&<span className="promotion-after" title="本关结束后晋升精英化二"><span>→</span><img src={asset("icons/elite-2.svg")} alt="关卡后晋升精英化二"/></span>}</button>;})}</>;
 }
 
-function OperatorAvatar({operator,state,size=58}:{operator:Operator;state?:CellState;size?:number}) {
+function OperatorAvatar({operator,state,size=58,recruitedHere=false}:{operator:Operator;state?:CellState;size?:number;recruitedHere?:boolean}) {
   const temporary=state?.recruitType==="temporary"; const skill=state?.skill ? operator.skills.find(s=>s.index===state.skill) : undefined;
-  return <div className="avatar-ring" style={{width:size,height:size,background:temporary?`conic-gradient(#7dd3fc 0deg 180deg, ${rarityColor[operator.rarity]} 180deg 360deg)`:rarityColor[operator.rarity]}} title={`${operator.name} · ${operator.rarity}星`}><img src={operator.avatar || asset("icons/operator-fallback.svg")} alt={operator.name} onError={(e)=>{e.currentTarget.onerror=null;e.currentTarget.src=asset("icons/operator-fallback.svg");}}/>{state?.elite&&<img className="image-badge elite-image" src={asset(`icons/elite-${state.elite}.svg`)} alt={`精英化${state.elite}`}/>} {state?.deployed&&state.skill&&<img className="image-badge skill-image" src={skill?.icon||asset("icons/skill-fallback.svg")} alt={skill?.name||`技能${state.skill}`} title={skill?.name||`技能 ${state.skill}`} onError={(e)=>{e.currentTarget.src=asset("icons/skill-fallback.svg");}}/>}{state?.recruitType&&<span className="recruit-badge">+</span>}</div>;
+  return <div className="avatar-ring" style={{width:size,height:size,background:temporary?`conic-gradient(#7dd3fc 0deg 180deg, ${rarityColor[operator.rarity]} 180deg 360deg)`:rarityColor[operator.rarity]}} title={`${operator.name} · ${operator.rarity}星`}><img src={operator.avatar || asset("icons/operator-fallback.svg")} alt={operator.name} onError={(e)=>{e.currentTarget.onerror=null;e.currentTarget.src=asset("icons/operator-fallback.svg");}}/>{state?.elite&&<img className="image-badge elite-image" src={asset(`icons/elite-${state.elite}.svg`)} alt={`精英化${state.elite}`}/>} {state?.deployed&&state.skill&&<img className="image-badge skill-image" src={skill?.icon||asset("icons/skill-fallback.svg")} alt={skill?.name||`技能${state.skill}`} title={skill?.name||`技能 ${state.skill}`} onError={(e)=>{e.currentTarget.src=asset("icons/skill-fallback.svg");}}/>}{recruitedHere&&<span className="recruit-badge">+</span>}</div>;
 }
 
 function CellEditor({operator,node,row,nodes,onChange,onClose}:{operator:Operator;node:TimelineNode;row:RunOperator;nodes:TimelineNode[];onChange:(p:Partial<CellState>)=>void;onClose:()=>void}) {
-  const index=nodes.findIndex(n=>n.id===node.id); const state=row.cells[node.id]??{}; const recruitIndex=nodes.findIndex(n=>Boolean(row.cells[n.id]?.recruitType)); const alreadyRecruited=recruitIndex>=0&&recruitIndex!==index; const effective=resolveEffectiveState(row,nodes,index); const maxPreviousElite=resolveEffectiveState(row,nodes,index-1).elite;
+  const index=nodes.findIndex(n=>n.id===node.id);
+  const state=row.cells[node.id]??{};
+  const recruitIndex=nodes.findIndex(n=>Boolean(row.cells[n.id]?.recruitType));
+  const alreadyRecruited=recruitIndex>=0&&recruitIndex!==index;
+  const effective=resolveEffectiveState(row,nodes,index);
+  const availableSkills=[...operator.skills].sort((a,b)=>a.index-b.index);
+  const firstSkill=availableSkills[0]?.index;
+  const canPromoteAfter=node.type==="combat"&&Boolean(effective.recruitType)&&effective.elite===1;
   return <Modal title={`${operator.name} · ${node.name}`} onClose={onClose}><div className="editor-form">
-    <div><div className="field-title">招募方式（只能选择一次）</div><div className="segmented"><button disabled={alreadyRecruited} className={state.recruitType==="normal"?"active":""} onClick={()=>onChange({recruitType:state.recruitType==="normal"?undefined:"normal",elite:state.elite??1})}>普通招募</button><button disabled={alreadyRecruited} className={state.recruitType==="temporary"?"active":""} onClick={()=>onChange({recruitType:state.recruitType==="temporary"?undefined:"temporary",elite:state.elite??1})}>临时招募</button></div>{alreadyRecruited&&<p className="hint">该干员已经在更早的节点招募，不能再次招募。</p>}</div>
-    <label className="check-row"><input type="checkbox" checked={Boolean(state.deployed)} disabled={!effective.recruitType} onChange={(e)=>onChange({deployed:e.target.checked,skill:e.target.checked?(state.skill??1):undefined})}/> 本关出场</label>
-    <div><div className="field-title">精英化</div><div className="segmented image-options">{([1,2] as Elite[]).map(elite=><button key={elite} disabled={!effective.recruitType || (maxPreviousElite===2&&elite===1)} className={effective.elite===elite?"active":""} onClick={()=>onChange({elite})}><img src={asset(`icons/elite-${elite}.svg`)}/><span>精英化 {elite}</span></button>)}</div>{maxPreviousElite===2&&<p className="hint">此前已经精英化二，后续节点不能降回精英化一。</p>}</div>
-    <div><div className="field-title">本关使用技能</div><div className="segmented image-options">{([1,2,3] as Skill[]).map(skill=>{const info=operator.skills.find(s=>s.index===skill);return <button key={skill} disabled={!effective.recruitType} className={state.deployed&&state.skill===skill?"active":""} onClick={()=>onChange({skill,deployed:true})}><img src={info?.icon||asset("icons/skill-fallback.svg")}/><span>{info?.name||`技能 ${skill}`}</span></button>})}</div></div>
+    <div><div className="field-title">招募方式（只能选择一次）</div><div className="segmented"><button disabled={alreadyRecruited} className={state.recruitType==="normal"?"active":""} onClick={()=>state.recruitType==="normal"?onChange({recruitType:undefined,elite:undefined,deployed:undefined,skill:undefined,promotionAfter:undefined}):onChange({recruitType:"normal",elite:state.elite??1})}>普通招募</button><button disabled={alreadyRecruited} className={state.recruitType==="temporary"?"active":""} onClick={()=>state.recruitType==="temporary"?onChange({recruitType:undefined,elite:undefined,deployed:undefined,skill:undefined,promotionAfter:undefined}):onChange({recruitType:"temporary",elite:state.elite??1})}>临时招募</button></div>{alreadyRecruited&&<p className="hint">该干员已经在更早的节点招募，不能再次招募。</p>}</div>
+    {state.recruitType&&<div><div className="field-title">招募时精英化状态</div><div className="segmented image-options"><button className={(state.elite??1)===1?"active":""} onClick={()=>onChange({elite:1})}><img src={asset("icons/elite-1.svg")}/><span>精英化一</span></button><button className={state.elite===2?"active":""} onClick={()=>onChange({elite:2,promotionAfter:undefined})}><img src={asset("icons/elite-2.svg")}/><span>直接精英化二</span></button></div><p className="hint">招募时可以直接获得精英化一或精英化二，不要求先精一再晋升。</p></div>}
+    <label className="check-row"><input type="checkbox" checked={Boolean(state.deployed)} disabled={!effective.recruitType} onChange={(e)=>onChange({deployed:e.target.checked,skill:e.target.checked?(state.skill??firstSkill):undefined})}/> 本关出场</label>
+    <div><div className="field-title">本关使用时的精英化状态</div><div className="current-elite"><img src={asset(`icons/elite-${effective.elite??1}.svg`)}/><span>精英化 {effective.elite??1}</span></div><p className="hint">招募时可直接选择精一或精二；若之后晋升，则从下一节点开始生效。</p></div>
+    <div><div className="field-title">关卡结束后</div><button className={`promotion-button ${state.promotionAfter===2?"active":""}`} disabled={!canPromoteAfter&&state.promotionAfter!==2} onClick={()=>onChange({promotionAfter:state.promotionAfter===2?undefined:2})}><img src={asset("icons/elite-2.svg")}/><span>{state.promotionAfter===2?"已标记：本关后晋升精英化二":"本关后晋升精英化二"}</span></button>{effective.elite===2&&<p className="hint">该干员在本关开始前已经是精英化二。</p>}</div>
+    <div><div className="field-title">本关使用技能</div>{availableSkills.length?<div className="segmented image-options">{availableSkills.map(info=><button key={info.index} disabled={!effective.recruitType} className={state.deployed&&state.skill===info.index?"active":""} onClick={()=>onChange({skill:info.index,deployed:true})}><img src={info.icon||asset("icons/skill-fallback.svg")}/><span>{info.name||`技能 ${info.index}`}</span></button>)}</div>:<p className="hint">PRTS 数据显示该干员没有可选择的技能。</p>}</div>
   </div></Modal>;
+}
+
+function PresetLibrary({presets,status,onClose,onPreview,onCopy}:{presets:LoadedPreset[];status:string;onClose:()=>void;onPreview:(id:string)=>void;onCopy:(preset:LoadedPreset)=>void}) {
+  return <Modal title="网站预设记录" onClose={onClose}><p className="muted">{status}</p>{presets.length?<div className="preset-list">{presets.map((preset)=><article className="preset-card" key={preset.id}><div className="preset-card-main"><div className="preset-card-title"><strong>{preset.name}</strong><span>{preset.theme}{preset.squad?` · ${preset.squad}`:""}</span></div>{preset.description&&<p>{preset.description}</p>}<div className="preset-meta">{preset.author&&<span>作者：{preset.author}</span>}{preset.event&&<span>活动：{preset.event}</span>}{preset.date&&<span>{preset.date}</span>}</div>{preset.tags?.length?<div className="preset-tags">{preset.tags.map((tag)=><span key={tag}>{tag}</span>)}</div>:null}</div><div className="preset-actions"><button className="ghost-button" onClick={()=>onPreview(preset.id)}>只读查看</button><button onClick={()=>onCopy(preset)}><Copy size={15}/> 复制到我的记录</button></div></article>)}</div>:<div className="empty-state"><p>还没有预设记录。</p><small>把导出的记录 JSON 放进 public/presets，并在 index.json 中登记即可。</small></div>}</Modal>;
 }
 
 function RunManager({store,onClose,onSelect,onCreate,onDelete}:{store:TrackerStore;onClose:()=>void;onSelect:(id:string)=>void;onCreate:()=>void;onDelete:(id:string)=>void}) { return <Modal title="保存与读取记录" onClose={onClose}><button className="wide-button" onClick={onCreate}><Plus size={16}/> 新建记录</button><div className="run-list">{[...store.runs].sort((a,b)=>b.updatedAt.localeCompare(a.updatedAt)).map(run=><div className={`run-card ${run.id===store.activeRunId?"active":""}`} key={run.id}><button className="run-open" onClick={()=>{onSelect(run.id);onClose();}}><strong>{run.name}</strong><span>{run.theme} · {new Date(run.updatedAt).toLocaleString("zh-CN")}</span></button><button className="danger-icon" disabled={store.runs.length===1} onClick={()=>onDelete(run.id)}><Trash2 size={16}/></button></div>)}</div></Modal> }
 function Stats({run,operatorMap}:{run:RunState;operatorMap:Record<string,Operator>}) { const rows=run.operators.map(r=>({op:operatorMap[r.operatorId],deploys:countDeploys(r),s1:countSkill(r,1),s2:countSkill(r,2),s3:countSkill(r,3)})).filter(x=>x.op).sort((a,b)=>b.deploys-a.deploys||b.op.rarity-a.op.rarity); return <section className="panel stats-panel"><div className="eyebrow">STATISTICS</div><h2>干员使用统计</h2>{rows.length?<div className="stats-table-wrap"><table><thead><tr><th>干员</th><th>星级</th><th>出场</th><th>S1</th><th>S2</th><th>S3</th></tr></thead><tbody>{rows.map(r=><tr key={r.op.id}><td>{r.op.name}</td><td>{r.op.rarity}</td><td>{r.deploys}</td><td>{r.s1}</td><td>{r.s2}</td><td>{r.s3}</td></tr>)}</tbody></table></div>:<p className="muted">添加干员并记录出场后自动统计。</p>}</section> }
 
-type AggregateSource = { id: string; label: string; run: RunState };
+type AggregateSource = { id: string; label: string; run: RunState; kind: "local" | "preset" | "file" };
 type AggregateRow = {
   op: Operator;
   normalRecruit: number;
@@ -222,7 +398,7 @@ type AggregateRow = {
   runsSeen: number;
 };
 
-function AggregateStats({store,operatorMap}:{store:TrackerStore;operatorMap:Record<string,Operator>}) {
+function AggregateStats({store,presets,operatorMap}:{store:TrackerStore;presets:LoadedPreset[];operatorMap:Record<string,Operator>}) {
   const [external, setExternal] = useState<AggregateSource[]>([]);
   const [excluded, setExcluded] = useState<Set<string>>(new Set());
   const [query, setQuery] = useState("");
@@ -234,9 +410,10 @@ function AggregateStats({store,operatorMap}:{store:TrackerStore;operatorMap:Reco
   const analysisInput = useRef<HTMLInputElement>(null);
 
   const sources = useMemo<AggregateSource[]>(() => [
-    ...store.runs.map((run) => ({ id: `local:${run.id}`, label: `本地 · ${run.name}`, run })),
+    ...store.runs.map((run) => ({ id: `local:${run.id}`, label: `本地 · ${run.name}`, run, kind: "local" as const })),
+    ...presets.map((preset) => ({ id: `preset:${preset.id}`, label: `预设 · ${preset.name}`, run: preset.run, kind: "preset" as const })),
     ...external,
-  ], [store.runs, external]);
+  ], [store.runs, presets, external]);
 
   const selectedRuns = useMemo(() => sources.filter((source) => !excluded.has(source.id)).map((source) => source.run), [sources, excluded]);
   const themeOptions = useMemo(() => [...new Set(sources.map((source) => source.run.theme))], [sources]);
@@ -295,7 +472,7 @@ function AggregateStats({store,operatorMap}:{store:TrackerStore;operatorMap:Reco
         const runs = "runs" in parsed && Array.isArray(parsed.runs) ? parsed.runs : [parsed as RunState];
         for (const run of runs) {
           if (!run?.id || !Array.isArray(run.nodes) || !Array.isArray(run.operators)) throw new Error("缺少记录字段");
-          additions.push({ id: `file:${file.name}:${run.id}:${uid()}`, label: `${file.name} · ${run.name}`, run });
+          additions.push({ id: `file:${file.name}:${run.id}:${uid()}`, label: `${file.name} · ${run.name}`, run, kind: "file" });
         }
       } catch (error) {
         alert(`${file.name} 无法用于统计：${error instanceof Error ? error.message : "格式错误"}`);
@@ -314,7 +491,7 @@ function AggregateStats({store,operatorMap}:{store:TrackerStore;operatorMap:Reco
 
   return <section className="panel stats-panel aggregate-panel">
     <div className="aggregate-heading">
-      <div><div className="eyebrow">MULTI-RUN ANALYSIS</div><h2>综合抓位与使用统计</h2><p className="muted">当前纳入 {selectedRuns.length} 个记录；导入的 JSON 仅用于分析，不会覆盖本地存档。</p></div>
+      <div><div className="eyebrow">MULTI-RUN ANALYSIS</div><h2>综合抓位与使用统计</h2><p className="muted">当前纳入 {selectedRuns.length} 个记录；预设和导入的 JSON 仅用于分析，不会覆盖本地存档。</p></div>
       <div className="top-actions"><button className="ghost-button" onClick={() => analysisInput.current?.click()}><Upload size={16}/> 导入分析 JSON</button>{external.length>0&&<button className="ghost-button" onClick={()=>setExternal([])}><Trash2 size={16}/> 清除导入</button>}<input ref={analysisInput} hidden multiple type="file" accept="application/json" onChange={(event)=>event.target.files&&addAnalysisFiles(event.target.files)}/></div>
     </div>
     <details className="source-selector"><summary>选择参与统计的记录（{selectedRuns.length}/{sources.length}）</summary><div className="source-grid">{sources.map((source)=><label key={source.id} className="check-row"><input type="checkbox" checked={!excluded.has(source.id)} onChange={()=>toggleSource(source.id)}/><span>{source.label}</span><small>{source.run.theme}</small></label>)}</div></details>
@@ -331,6 +508,19 @@ function AggregateStats({store,operatorMap}:{store:TrackerStore;operatorMap:Reco
 }
 
 function Modal({title,children,onClose}:{title:string;children:React.ReactNode;onClose:()=>void}) { return <div className="modal-backdrop" onMouseDown={onClose}><div className="modal" onMouseDown={e=>e.stopPropagation()}><div className="modal-header"><h3>{title}</h3><button onClick={onClose}><X size={18}/></button></div>{children}</div></div> }
-function resolveEffectiveState(row:RunOperator,nodes:TimelineNode[],index:number):CellState { const result:CellState={}; if(index<0)return result; for(let i=0;i<=index;i++){const cell=row.cells[nodes[i].id];if(!cell)continue;if(cell.recruitType)result.recruitType=cell.recruitType;if(cell.elite&&(!result.elite||cell.elite>result.elite))result.elite=cell.elite;} return result; }
+function resolveEffectiveState(row:RunOperator,nodes:TimelineNode[],index:number):CellState {
+  const result:CellState={};
+  if(index<0)return result;
+  for(let i=0;i<=index;i++){
+    const cell=row.cells[nodes[i].id];
+    if(!cell)continue;
+    if(cell.recruitType){result.recruitType=cell.recruitType;result.elite=cell.elite??1;}
+    // 兼容旧记录：非招募节点上的 elite 仍按立即晋升处理。
+    if(cell.elite&&!cell.recruitType&&(!result.elite||cell.elite>result.elite))result.elite=cell.elite;
+    // 新记录中的 promotionAfter 只从下一个节点开始生效。
+    if(i<index&&cell.promotionAfter===2)result.elite=2;
+  }
+  return result;
+}
 function countDeploys(row:RunOperator){return Object.values(row.cells).filter(c=>c.deployed).length;} function countSkill(row:RunOperator,skill:Skill){return Object.values(row.cells).filter(c=>c.deployed&&c.skill===skill).length;}
 export default App;

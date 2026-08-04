@@ -4,6 +4,7 @@ import crypto from "node:crypto";
 import https from "node:https";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
+import * as cheerio from "cheerio";
 
 const execFileAsync = promisify(execFile);
 
@@ -17,6 +18,15 @@ const FORCE = process.argv.includes("--force");
 const STAGES_ONLY = process.argv.includes("--stages-only");
 const OPERATORS_ONLY = process.argv.includes("--operators-only");
 const MAX_AGE = 24 * 60 * 60 * 1000;
+
+function decodeHtmlEntities(value) {
+  const input = String(value ?? "");
+  if (!input.includes("&")) return input;
+
+  // Let Cheerio's HTML parser decode named and numeric entities consistently.
+  const $ = cheerio.load(`<textarea>${input}</textarea>`, null, false);
+  return $("textarea").text();
+}
 
 await fs.mkdir(OUT, { recursive: true });
 const manifestPath = path.join(OUT, "manifest.json");
@@ -129,20 +139,73 @@ async function resolveFileUrls(filenames) {
   return result;
 }
 
+const PROFESSION_ALIASES = new Map([
+  ["PIONEER", "VANGUARD"], ["VANGUARD", "VANGUARD"], ["先锋", "VANGUARD"],
+  ["WARRIOR", "GUARD"], ["GUARD", "GUARD"], ["近卫", "GUARD"],
+  ["TANK", "DEFENDER"], ["DEFENDER", "DEFENDER"], ["重装", "DEFENDER"],
+  ["SNIPER", "SNIPER"], ["狙击", "SNIPER"],
+  ["CASTER", "CASTER"], ["术师", "CASTER"],
+  ["MEDIC", "MEDIC"], ["医疗", "MEDIC"],
+  ["SUPPORT", "SUPPORTER"], ["SUPPORTER", "SUPPORTER"], ["辅助", "SUPPORTER"],
+  ["SPECIAL", "SPECIALIST"], ["SPECIALIST", "SPECIALIST"], ["特种", "SPECIALIST"],
+]);
+
+function normalizeProfession(value) {
+  const raw = String(value ?? "").trim();
+  return PROFESSION_ALIASES.get(raw) || PROFESSION_ALIASES.get(raw.toUpperCase()) || raw.toUpperCase();
+}
+
 async function operatorList() {
   const data = await request({ action: "parse", page: "干员一览", prop: "text|revid" });
-  const html = typeof data.parse.text === "string" ? data.parse.text : data.parse.text["*"];
-  const block = html.match(/<div[^>]+id="filter-data"[\s\S]*?<\/div>\s*<\/div>/)?.[0] ?? html;
-  const entries = [...block.matchAll(/<div\s+([^>]*data-zh="[^"]+"[^>]*)>/g)].map((m) => attrs(m[1]));
+  const html = typeof data.parse?.text === "string" ? data.parse.text : data.parse?.text?.["*"];
+  if (!html) {
+    throw new Error("PRTS 干员一览 API 未返回 HTML，无法解析干员列表");
+  }
+
+  // Parse the actual DOM instead of matching a nested div with a non-greedy
+  // regular expression. The old expression could stop at the first child
+  // closing tag and return an empty operator list after unrelated page edits.
+  const $ = cheerio.load(html);
+  const container = $("#filter-data");
+  const nodes = container.length
+    ? container.children("div[data-zh]")
+    : $("div[data-zh]");
+
   const seen = new Set();
   const operators = [];
-  for (const entry of entries) {
-    const name = entry["data-zh"]; if (!name || seen.has(name)) continue; seen.add(name);
-    const rarityRaw = entry["data-rarity"] || entry["data-star"] || entry["data-rank"] || "3";
-    const rarity = Math.max(1, Math.min(6, Number(String(rarityRaw).replace(/\D/g, "")) || 3));
-    operators.push({ name, rarity });
+  nodes.each((_, element) => {
+    const entry = element.attribs ?? {};
+    const name = String(entry["data-zh"] ?? "").trim();
+    if (!name || seen.has(name)) return;
+    seen.add(name);
+
+    // PRTS data-rarity is zero-based: 0 means 1-star and 5 means 6-star.
+    // data-star/data-rank, when present, are treated as direct 1-6 values.
+    const rarityField = entry["data-rarity"] !== undefined
+      ? "data-rarity"
+      : entry["data-star"] !== undefined
+        ? "data-star"
+        : "data-rank";
+    const rarityRaw = entry[rarityField] ?? "3";
+    const parsedRarity = Number(String(rarityRaw).replace(/\D/g, ""));
+    const rarity = rarityField === "data-rarity"
+      ? Math.max(1, Math.min(6, (Number.isFinite(parsedRarity) ? parsedRarity : 2) + 1))
+      : Math.max(1, Math.min(6, Number.isFinite(parsedRarity) && parsedRarity > 0 ? parsedRarity : 3));
+    const profession = normalizeProfession(
+      entry["data-profession"] || entry["data-class"] || entry["data-job"] || "",
+    );
+    operators.push({ name, rarity, profession });
+  });
+
+  if (operators.length < 100) {
+    await fs.mkdir(path.join(OUT, "debug"), { recursive: true });
+    await fs.writeFile(path.join(OUT, "debug", "operator-list.html"), html, "utf8");
+    throw new Error(
+      `只从干员一览解析到 ${operators.length} 个干员，拒绝继续同步。调试页面已保存到 public/data/debug/operator-list.html`,
+    );
   }
-  return { operators, revid: data.parse.revid };
+
+  return { operators, revid: data.parse?.revid };
 }
 
 function imageSource(page) {
@@ -322,8 +385,8 @@ function prtsFileUrl(filename) {
   return `https://media.prts.wiki/${digest[0]}/${digest.slice(0, 2)}/${encodeURIComponent(filename).replace(/%2F/gi, "/")}`;
 }
 
-async function operatorDetails({ name, rarity }) {
-  const data = await request({ action: "parse", page: name, prop: "text|wikitext|revid" });
+async function operatorDetails({ name, rarity, profession }) {
+  const data = await request({ action: "parse", page: name, prop: "text|revid" });
   const html = typeof data.parse.text === "string" ? data.parse.text : data.parse.text["*"];
   let source = rawWikitext(data);
 
@@ -358,7 +421,7 @@ async function operatorDetails({ name, rarity }) {
     || await resolveAvatarFromFiles(name, html);
 
   return {
-    id: name, name, rarity,
+    id: name, name, rarity, profession,
     avatar,
     skills: skillNames.map((skillName, index) => ({
       index: index + 1,
@@ -376,8 +439,17 @@ async function syncOperators() {
   for (let i = 0; i < list.length; i += 6) {
     const chunk = list.slice(i, i + 6);
     const settled = await Promise.allSettled(chunk.map(operatorDetails));
-    for (const item of settled) if (item.status === "fulfilled") result.push(item.value);
-    console.log(`Operators: ${Math.min(i + chunk.length, list.length)}/${list.length}`);
+    const failures = [];
+    for (let j = 0; j < settled.length; j += 1) {
+      const item = settled[j];
+      if (item.status === "fulfilled") result.push(item.value);
+      else failures.push({ name: chunk[j]?.name ?? "unknown", reason: item.reason });
+    }
+    if (failures.length) {
+      const first = failures[0];
+      console.warn(`Operator detail failures in this batch: ${failures.length}. First: ${first.name}: ${first.reason?.message ?? first.reason}`);
+    }
+    console.log(`Operators: ${Math.min(i + chunk.length, list.length)}/${list.length} (${result.length} resolved)`);
     await new Promise((resolve) => setTimeout(resolve, 150));
   }
   const operatorsWithSkills = result.filter((operator) => operator.skills.length > 0).length;
@@ -386,8 +458,11 @@ async function syncOperators() {
     0,
   );
   console.log(`Skills: ${operatorsWithSkills}/${result.length} operators, ${resolvedSkillIcons} resolved icons`);
+  if (result.length === 0) {
+    throw new Error("427 个干员详情请求全部失败。请查看上方 First failure；同步器不会再把请求失败误报为技能解析失败");
+  }
   if (operatorsWithSkills === 0) {
-    throw new Error("没有从任何干员页面解析到技能。PRTS 页面结构可能已变化，拒绝覆盖现有数据");
+    throw new Error("干员详情已获取，但没有从任何干员页面解析到技能。请检查 public/data/debug 中的页面结构");
   }
 
   const missingAvatars = result.filter((operator) => !operator.avatar).map((operator) => operator.name);
@@ -424,7 +499,7 @@ const ROGUELIKE_THEMES = [
 ];
 
 const FLOOR_MAP = new Map([
-  ["0", 0], ["Ⅰ", 1], ["I", 1], ["一", 1],
+  ["Ⅰ", 1], ["I", 1], ["一", 1],
   ["Ⅱ", 2], ["II", 2], ["二", 2],
   ["Ⅲ", 3], ["III", 3], ["三", 3],
   ["Ⅳ", 4], ["IV", 4], ["四", 4],
@@ -433,166 +508,376 @@ const FLOOR_MAP = new Map([
   ["Ⅶ", 7], ["VII", 7], ["七", 7],
 ]);
 
-const htmlText = (html) => html
-  .replace(/<script[\s\S]*?<\/script>/gi, " ")
-  .replace(/<style[\s\S]*?<\/style>/gi, " ")
-  .replace(/<[^>]+>/g, " ")
-  .replace(/&nbsp;|&#160;/g, " ")
-  .replace(/&amp;/g, "&")
-  .replace(/&#39;/g, "'")
-  .replace(/&quot;/g, '"')
-  .replace(/\s+/g, " ")
-  .trim();
-
-function floorFromText(text) {
-  const normalized = htmlText(text)
-    .replace(/[：:、，,|｜]/g, " ")
-    .replace(/第\s*/g, "")
-    .replace(/\s*层/g, "")
+function compactText(value) {
+  return decodeHtmlEntities(String(value ?? ""))
+    // Content-expansion notes are bracketed, e.g. [Ⅱ]. Bare Ⅰ/Ⅱ/Ⅲ are
+    // floor labels and must never be removed here.
+    .replace(/\[[ⅠⅡⅢⅣⅤⅥIVX]+\]/gi, "")
+    .replace(/\s+/g, " ")
     .trim();
+}
 
-  const tokens = normalized.split(/\s+/).filter(Boolean);
-  for (const token of tokens) {
-    const cleaned = token.replace(/[()（）【】\[\]]/g, "");
-    if (FLOOR_MAP.has(cleaned)) return FLOOR_MAP.get(cleaned);
+function exactFloor(value) {
+  const text = compactText(value)
+    .replace(/^第\s*/, "")
+    .replace(/\s*层$/, "")
+    .replace(/[()（）【】\[\]：:]/g, "")
+    .trim();
+  return FLOOR_MAP.get(text);
+}
+
+function normalizeStageHref(href) {
+  if (!href) return "";
+  if (/^https?:\/\//.test(href)) return href;
+  return new URL(href, "https://prts.wiki").href;
+}
+
+function cleanStageName(value) {
+  return compactText(value)
+    .replace(/\^\{?\[?[ⅠⅡⅢIVX]+\]?\}?$/gi, "")
+    .replace(/[¹²³]+$/g, "")
+    .trim();
+}
+
+const NON_STAGE_NAMES = new Set([
+  "查看活动详情", "遭遇记录", "关卡一览", "集成战略", "作战", "编辑",
+  "一般作战", "普通作战", "紧急作战", "一般作战 & 紧急作战",
+  "一般作战&紧急作战", "单", "双", "文件", "图片",
+]);
+
+function directTableRows($, table) {
+  const rows = $(table).children("tbody,thead,tfoot").children("tr").toArray();
+  return rows.length ? rows : $(table).children("tr").toArray();
+}
+
+function sectionNameFromTable($, table, sectionCode) {
+  const rows = directTableRows($, table);
+  let codeRowIndex = -1;
+  for (let i = 0; i < rows.length; i++) {
+    if (compactText($(rows[i]).text()).includes(sectionCode)) {
+      codeRowIndex = i;
+      const cells = $(rows[i]).find("th,td").toArray().map((cell) => compactText($(cell).text()));
+      const inline = cells
+        .map((text) => text.replace(sectionCode, "").trim())
+        .find((text) => text && exactFloor(text) === undefined && text.length <= 50);
+      if (inline) return inline;
+      break;
+    }
+  }
+  for (let i = Math.max(0, codeRowIndex + 1); i < Math.min(rows.length, codeRowIndex + 4); i++) {
+    const text = compactText($(rows[i]).text());
+    if (!text || exactFloor(text) !== undefined) continue;
+    if ($(rows[i]).find("a").length > 3) continue;
+    return text.replace(sectionCode, "").trim();
+  }
+  return sectionCode;
+}
+
+
+function textWithBreaks($, node) {
+  const clone = $(node).clone();
+  clone.find("br").replaceWith(" ");
+  clone.find("sup").remove();
+  return compactText(clone.text());
+}
+
+function sectionHeaderFromRow($, tr) {
+  const cells = $(tr).children("th,td").toArray();
+  if (!cells.length) return null;
+  if ($(tr).children("th,td").find("table").length) return null;
+  const text = compactText(cells.map((cell) => textWithBreaks($, cell)).join(" "));
+  if (!/^ISW-[A-Z0-9-]+(?:\s*&\s*ISW-[A-Z0-9-]+)*\s+/i.test(text)) return null;
+  if ($(tr).children("th,td").find('a[href*="/w/ISW-"]').length) return null;
+  const codeMatch = text.match(/^(ISW-[A-Z0-9-]+(?:\s*&\s*ISW-[A-Z0-9-]+)*)\s+(.+)$/i);
+  if (!codeMatch) return null;
+  return {
+    code: codeMatch[1].toUpperCase().replace(/\s+/g, " "),
+    name: codeMatch[2].trim(),
+  };
+}
+
+function imageFloorKey($, cell) {
+  const parts = [];
+  $(cell).find("img,source").each((_, node) => {
+    for (const attr of ["alt", "title", "src", "data-src", "srcset"]) {
+      const value = $(node).attr(attr);
+      if (value) parts.push(String(value));
+    }
+  });
+  $(cell).find("a").each((_, node) => {
+    for (const attr of ["title", "href"]) {
+      const value = $(node).attr(attr);
+      if (value) parts.push(String(value));
+    }
+  });
+  return compactText(parts.map((value) => {
+    try { return decodeURIComponent(value); } catch { return value; }
+  }).join(" | "));
+}
+
+function floorFromImageMetadata($, cell) {
+  const key = imageFloorKey($, cell);
+  if (!key) return undefined;
+
+  // Prefer explicit phrases such as “第3层”, “第三层”, “区域Ⅲ” or file
+  // names containing a standalone floor marker. Do not treat arbitrary digits
+  // in hashes, dimensions or cache parameters as floor numbers.
+  const patterns = [
+    /第\s*([1-7一二三四五六七ⅠⅡⅢⅣⅤⅥⅦ]+)\s*层/i,
+    /(?:楼层|层级|区域|区域层)\s*[_ -]*([1-7一二三四五六七ⅠⅡⅢⅣⅤⅥⅦ]+)/i,
+    /(?:^|[_\s-])([ⅠⅡⅢⅣⅤⅥⅦ])(?:[_\s.-]|$)/,
+  ];
+  for (const pattern of patterns) {
+    const match = key.match(pattern);
+    if (!match) continue;
+    const floor = exactFloor(match[1]);
+    if (floor !== undefined) return floor;
   }
   return undefined;
 }
 
-const STAGE_CATEGORIES = new Set([
-  "一般作战", "紧急作战", "险路恶敌", "区域最终战斗", "特殊挑战",
-]);
-const STOP_CATEGORIES = new Set([
-  "不期而遇", "鸭爵与雇员", "剧情", "事件一览", "诡意行商", "安全屋",
-  "得偿所愿", "古堡馈赠", "深入探索", "追忆映射",
-]);
-const SKIP_STAGE_LINKS = new Set([
-  "查看活动详情", "展开", "部分随机", "敌人一览", "关卡一览", "集成战略",
-  ...STAGE_CATEGORIES, ...STOP_CATEGORIES,
-  "编辑", "讨论", "历史", "首页", "文件", "分类", "模板",
-]);
+function learnImageFloorMap($, rows) {
+  const learned = new Map();
+  let sectionName = "";
+  let normalEmergencySequence = 0;
 
-function decodeHtmlEntities(value) {
-  return value
-    .replace(/&nbsp;|&#160;/gi, " ")
-    .replace(/&amp;/gi, "&")
-    .replace(/&quot;/gi, '"')
-    .replace(/&#39;|&apos;/gi, "'")
-    .replace(/&lt;/gi, "<")
-    .replace(/&gt;/gi, ">")
-    .replace(/&#(\d+);/g, (_, code) => String.fromCodePoint(Number(code)))
-    .replace(/&#x([0-9a-f]+);/gi, (_, code) => String.fromCodePoint(parseInt(code, 16)));
-}
-
-function htmlToStageLines(html) {
-  // Keep every link as an explicit token and force common block elements onto
-  // separate lines. PRTS navboxes often place a whole theme in nested divs;
-  // scanning raw text nodes merges headings, floors and stages together.
-  const withLinks = html.replace(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi, (_, rawAttrs, body) => {
-    const attr = attrs(rawAttrs);
-    const name = htmlText(body).replace(/[ⅠⅡⅢ]$/, "").trim();
-    const href = attr.href || "";
-    return `\n@@LINK@@${encodeURIComponent(href)}@@${encodeURIComponent(name)}\n`;
-  });
-  return decodeHtmlEntities(withLinks
-    .replace(/<script[\s\S]*?<\/script>/gi, " ")
-    .replace(/<style[\s\S]*?<\/style>/gi, " ")
-    .replace(/<br\s*\/?>/gi, "\n")
-    .replace(/<\/(?:div|li|ul|ol|tr|td|th|table|p|h[1-6]|dl|dt|dd)>/gi, "\n")
-    .replace(/<(?:div|li|ul|ol|tr|td|th|table|p|h[1-6]|dl|dt|dd)\b[^>]*>/gi, "\n")
-    .replace(/<[^>]+>/g, " "))
-    .split(/\r?\n/)
-    .map((line) => line.replace(/\s+/g, " ").trim())
-    .filter(Boolean);
-}
-
-function stageLinksFromHtml(theme, html) {
-  const result = [];
-  const seen = new Set();
-  let currentTheme;
-  let currentFloor;
-  let inCombat = false;
-  let inStageCategory = false;
-
-  const setTextState = (text) => {
-    const clean = text.replace(/[\[\]【】]/g, "").trim();
-    const exactTheme = ROGUELIKE_THEMES.find((candidate) => clean === candidate || clean === `集成战略「${candidate}」`);
-    if (exactTheme) {
-      currentTheme = exactTheme;
-      currentFloor = undefined;
-      inCombat = false;
-      inStageCategory = false;
-      return;
-    }
-    if (currentTheme !== theme) return;
-    if (clean === "作战") { inCombat = true; return; }
-    if (STOP_CATEGORIES.has(clean) || /^(不期而遇|鸭爵与雇员|剧情|档案|诡意行商|狭路相逢|命运所指|海中来客|误入奇境|指点迷津|明烛试炼)/.test(clean)) {
-      inStageCategory = false;
-      currentFloor = undefined;
-      return;
-    }
-    if (STAGE_CATEGORIES.has(clean) || clean === "一般作战 & 紧急作战" || clean === "一般作战&紧急作战") {
-      inCombat = true;
-      inStageCategory = true;
-      currentFloor = undefined;
-      return;
-    }
-    const floor = floorFromText(clean);
-    if (inCombat && inStageCategory && floor !== undefined) currentFloor = floor;
-  };
-
-  for (const line of htmlToStageLines(html)) {
-    if (!line.startsWith("@@LINK@@")) {
-      setTextState(line);
+  for (const tr of rows) {
+    const header = sectionHeaderFromRow($, tr);
+    if (header) {
+      sectionName = header.name;
+      normalEmergencySequence = 0;
       continue;
     }
-    const marker = line.match(/^@@LINK@@([^@]*)@@(.*)$/);
-    if (!marker) continue;
-    const href = decodeURIComponent(marker[1] || "");
-    const name = decodeURIComponent(marker[2] || "").replace(/[ⅠⅡⅢ]$/, "").trim();
-    if (!name) continue;
 
-    if (ROGUELIKE_THEMES.includes(name)) { setTextState(name); continue; }
-    if (STAGE_CATEGORIES.has(name) || STOP_CATEGORIES.has(name)) { setTextState(name); continue; }
-    const linkFloor = floorFromText(name);
-    if (name.length <= 8 && linkFloor !== undefined) { setTextState(name); continue; }
+    const cells = $(tr).children("th,td").toArray();
+    if (!cells.length) continue;
+    const firstCell = $(cells[0]);
+    const key = imageFloorKey($, firstCell);
+    if (!key || !firstCell.find("img,source").length) continue;
 
-    if (currentTheme !== theme || !inStageCategory || currentFloor === undefined || currentFloor === 0) continue;
-    if (name.length > 40 || SKIP_STAGE_LINKS.has(name)) continue;
-    if (/^(文件|分类|模板|帮助|特殊|用户|集成战略)[:：]/.test(name)) continue;
-    if (!href.startsWith("/w/") && !href.includes("title=")) continue;
+    const metadataFloor = floorFromImageMetadata($, firstCell);
+    if (metadataFloor !== undefined) {
+      learned.set(key, metadataFloor);
+      continue;
+    }
 
-    const key = `${theme}|${currentFloor}|${name}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    result.push({
-      id: key,
-      theme,
-      name,
-      floor: currentFloor,
-      prtsUrl: href.startsWith("http") ? href : `https://prts.wiki${href}`,
-    });
+    // The general/emergency table is the only safe baseline for ordered image
+    // labels: it enumerates the main route from floor 1 onward. Learn each
+    // image's absolute floor here, then reuse that exact image in sections such
+    // as 险路恶敌 that may start at floor 3 or 5. Never restart numbering in
+    // each section.
+    const isNormalEmergency = /(?:一般|普通)作战/.test(sectionName) && /紧急作战/.test(sectionName);
+    const rowHasStageLink = $(tr).find('a[href*="/w/ISW-"],a[href*="title=ISW-"]').length > 0;
+    if (isNormalEmergency && rowHasStageLink) {
+      normalEmergencySequence += 1;
+      learned.set(key, normalEmergencySequence);
+    }
   }
-  return result;
+  return learned;
 }
 
-let navboxCache;
-async function navboxStages(theme) {
-  if (!navboxCache) {
-    navboxCache = await request({
-      action: "parse",
-      page: "模板:Navbox 集成战略",
-      prop: "text|revid",
+function stageRowsFromOrderedRows(theme, $, rows, sharedImageFloorMap = new Map()) {
+  const output = [];
+  const seen = new Set();
+  const imageFloorMap = sharedImageFloorMap;
+  let sectionCode = "";
+  let sectionName = "";
+  let currentFloor = 0;
+
+  for (const tr of rows) {
+    const header = sectionHeaderFromRow($, tr);
+    if (header) {
+      sectionCode = header.code;
+      sectionName = header.name;
+      currentFloor = 0;
+      continue;
+    }
+    if (!sectionCode) continue;
+
+    const cells = $(tr).children("th,td").toArray();
+    let explicitFloor;
+    for (const cell of cells) {
+      const floor = exactFloor($(cell).clone().find("sup").remove().end().text());
+      if (floor !== undefined) {
+        explicitFloor = floor;
+        currentFloor = floor;
+        break;
+      }
+    }
+
+    // Some themes (notably 岁的界园志异) render floor labels as images.
+    // Resolve the image to an absolute floor using its own metadata or the map
+    // learned from the complete general/emergency section. Never assume that
+    // the first image in every section means floor 1: boss sections may begin
+    // at floor 3 or 5.
+    if (explicitFloor === undefined && cells.length > 0) {
+      const firstCell = $(cells[0]);
+      const key = imageFloorKey($, firstCell);
+      const imageFloor = floorFromImageMetadata($, firstCell) ?? imageFloorMap.get(key);
+      if (imageFloor !== undefined) currentFloor = imageFloor;
+      else if (firstCell.find("img,source").length > 0) currentFloor = 0;
+    }
+
+    const isNormalEmergency = /(?:一般|普通)作战/.test(sectionName) && /紧急作战/.test(sectionName);
+    $(tr).children("th,td").find("a[href]").each((__, anchor) => {
+      const href = String($(anchor).attr("href") ?? "");
+      const name = cleanStageName($(anchor).clone().find("sup").remove().end().text());
+      if (!name || name.length > 50 || NON_STAGE_NAMES.has(name)) return;
+      if (ROGUELIKE_THEMES.includes(name) || /^ISW-/i.test(name)) return;
+      if (/^(?:文件|File|分类|模板|用户|帮助)[:：]/i.test(name)) return;
+      if (href.startsWith("#") || /^(?:mailto|javascript):/i.test(href)) return;
+      if (!href.startsWith("/w/") && !href.startsWith("./") && !href.includes("title=") && !/^https?:\/\/(?:[^/]+\.)?prts\.wiki/i.test(href)) return;
+      if (!/(?:\/w\/|title=)ISW-/i.test(href)) return;
+      if (/^(?:单|双|普通|紧急)$/.test(name)) return;
+
+      const variants = isNormalEmergency
+        ? [
+            { id: "normal", name: "一般作战" },
+            { id: "emergency", name: "紧急作战" },
+          ]
+        : [{ id: "default", name: sectionName }];
+
+      for (const variant of variants) {
+        const categoryId = `${sectionCode}:${variant.id}`;
+        const key = `${theme}|${sectionCode}|${currentFloor}|${variant.id}|${name}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        output.push({
+          id: key,
+          theme,
+          name,
+          floor: currentFloor,
+          sectionCode,
+          sectionName,
+          categoryId,
+          categoryName: variant.name,
+          variant: variant.id,
+          prtsUrl: normalizeStageHref(href),
+        });
+      }
     });
   }
-  const html = typeof navboxCache.parse.text === "string"
-    ? navboxCache.parse.text
-    : navboxCache.parse.text["*"];
-  return {
-    stages: stageLinksFromHtml(theme, html, { navbox: true }),
-    revid: navboxCache.parse.revid,
-    source: "模板:Navbox 集成战略",
-  };
+  return output;
+}
+
+function directRowsOfTable($, table) {
+  // MediaWiki always inserts tbody in parsed HTML. Use only direct rows so
+  // wrapper tables cannot duplicate rows from nested stage tables.
+  const bodyRows = $(table).children("tbody,thead,tfoot").children("tr").toArray();
+  return bodyRows.length ? bodyRows : $(table).children("tr").toArray();
+}
+
+function isStageTable($, table) {
+  const rows = directRowsOfTable($, table);
+  if (!rows.length) return false;
+  return rows.some((tr) => {
+    const text = compactText($(tr).children("th,td").toArray().map((cell) => textWithBreaks($, cell)).join(" "));
+    return /^ISW-[A-Z0-9-]+(?:\s*&\s*ISW-[A-Z0-9-]+)*(?:\s+|$)/i.test(text);
+  });
+}
+
+function stageSectionRoot($) {
+  const headline = $("#关卡一览").first();
+  if (!headline.length) return $.root();
+  const heading = headline.closest("h2,h3");
+  if (!heading.length) return $.root();
+
+  const nodes = [];
+  let node = heading.next();
+  while (node.length) {
+    if (node.is("h2")) break;
+    nodes.push(node.get(0));
+    node = node.next();
+  }
+  return nodes.length ? $(nodes) : $.root();
+}
+
+function innermostStageTables($, root) {
+  // `root` may itself be a collection containing the stage table as a direct
+  // sibling of the “关卡一览” heading. Cheerio's `.find()` only searches
+  // descendants, so include root-level tables explicitly.
+  const allTables = [
+    ...root.filter("table").toArray(),
+    ...root.find("table").toArray(),
+  ];
+  const uniqueTables = [...new Set(allTables)];
+  const candidates = uniqueTables.filter((table) => isStageTable($, table));
+
+  // Keep tables that do not contain another valid stage table. This removes
+  // outer MediaWiki/collapsible wrapper tables while preserving the actual
+  // ISW tables. A single table may contain multiple ISW sections.
+  return candidates.filter((table) => {
+    return !$(table).find("table").toArray().some((child) => child !== table && isStageTable($, child));
+  });
+}
+
+const THEME_STAGE_ADAPTERS = {
+  // Optional per-theme overrides can be registered here if PRTS introduces a
+  // genuinely different representation. Current themes use the same ISW table
+  // semantics despite different numbers and names of sections.
+};
+
+function parseStageTables(theme, html) {
+  const $ = cheerio.load(html);
+  const adapter = THEME_STAGE_ADAPTERS[theme];
+  if (adapter) return adapter(theme, $, html);
+
+  const root = stageSectionRoot($);
+  const tables = innermostStageTables($, root);
+  if (!tables.length && process.env.PRTS_DEBUG === "1") {
+    const rootLevelTables = root.filter("table").length;
+    const descendantTables = root.find("table").length;
+    console.warn(`Stage parser debug (${theme}): root tables=${rootLevelTables}, descendant tables=${descendantTables}`);
+  }
+  const output = [];
+  const seen = new Set();
+  const tableRows = tables.map((table) => directRowsOfTable($, table));
+  const imageFloorMap = new Map();
+  for (const rows of tableRows) {
+    for (const [key, floor] of learnImageFloorMap($, rows)) imageFloorMap.set(key, floor);
+  }
+
+  for (const rows of tableRows) {
+    const parsed = stageRowsFromOrderedRows(theme, $, rows, imageFloorMap);
+    for (const stage of parsed) {
+      if (seen.has(stage.id)) continue;
+      seen.add(stage.id);
+      output.push(stage);
+    }
+  }
+  return output;
+}
+
+function categorySummary(stages) {
+  const categories = new Map();
+  for (const stage of stages) {
+    if (!categories.has(stage.categoryId)) {
+      categories.set(stage.categoryId, {
+        id: stage.categoryId,
+        sectionCode: stage.sectionCode,
+        sectionName: stage.sectionName,
+        name: stage.categoryName,
+        count: 0,
+      });
+    }
+    categories.get(stage.categoryId).count += 1;
+  }
+  return [...categories.values()];
+}
+
+function validateThemeStages(theme, stages) {
+  if (stages.length < 10) throw new Error(`${theme}: 只解析到 ${stages.length} 个关卡`);
+  const categories = categorySummary(stages);
+  if (categories.length < 2) throw new Error(`${theme}: 只识别到 ${categories.length} 个关卡区块类别`);
+  const combinedSections = [...new Set(stages.filter((stage) => /一般作战/.test(stage.sectionName) && /紧急作战/.test(stage.sectionName)).map((stage) => stage.sectionCode))];
+  for (const sectionCode of combinedSections) {
+    const normal = new Set(stages.filter((stage) => stage.sectionCode === sectionCode && stage.variant === "normal").map((stage) => `${stage.floor}|${stage.name}`));
+    const emergency = new Set(stages.filter((stage) => stage.sectionCode === sectionCode && stage.variant === "emergency").map((stage) => `${stage.floor}|${stage.name}`));
+    if (!normal.size || normal.size !== emergency.size || [...normal].some((key) => !emergency.has(key))) {
+      throw new Error(`${theme}: ${sectionCode} 的一般/紧急作战展开结果不一致`);
+    }
+  }
+  return stages;
 }
 
 async function stageSection(theme) {
@@ -604,41 +889,35 @@ async function stageSection(theme) {
   if (section) {
     const parsed = await request({ action: "parse", page: theme, section: section.index, prop: "text|revid" });
     const html = typeof parsed.parse.text === "string" ? parsed.parse.text : parsed.parse.text["*"];
-    const stages = stageLinksFromHtml(theme, html);
+    const stages = parseStageTables(theme, html);
     attempts.push(`主题页“关卡一览”章节=${stages.length}`);
     if (stages.length >= 10) {
-      return { stages, revid: parsed.parse.revid ?? sectionList.parse.revid, source: `${theme}#关卡一览` };
+      return { stages: validateThemeStages(theme, stages), revid: parsed.parse.revid ?? sectionList.parse.revid, source: `${theme}#关卡一览` };
     }
   } else {
     attempts.push("主题页没有“关卡一览”章节");
   }
 
-  // 有些主题的楼层标题由章节外层模板提供，单独解析 section 会丢失楼层上下文。
   const fullPage = await request({ action: "parse", page: theme, prop: "text|revid" });
   const fullHtml = typeof fullPage.parse.text === "string" ? fullPage.parse.text : fullPage.parse.text["*"];
-  const fullStages = stageLinksFromHtml(theme, fullHtml);
+  const fullStages = parseStageTables(theme, fullHtml);
   attempts.push(`完整主题页=${fullStages.length}`);
   if (fullStages.length >= 10) {
-    return { stages: fullStages, revid: fullPage.parse.revid, source: theme };
+    return { stages: validateThemeStages(theme, fullStages), revid: fullPage.parse.revid, source: theme };
   }
 
-  // 最稳定的回退：统一导航模板按主题→作战类型→楼层组织所有关卡。
-  const navbox = await navboxStages(theme);
-  attempts.push(`统一导航模板=${navbox.stages.length}`);
-  if (navbox.stages.length >= 10) return navbox;
-
-  // 保存页面 HTML，便于 PRTS 模板再次变化时定位，不覆盖已有 stages.json。
   const debugDir = path.join(OUT, "debug");
   await fs.mkdir(debugDir, { recursive: true });
   await fs.writeFile(path.join(debugDir, `${safeName(theme)}.html`), fullHtml);
-  throw new Error(`${theme}: 未能可靠解析关卡（${attempts.join("，")}）。调试页面已保存到 public/data/debug/${safeName(theme)}.html`);
+  throw new Error(`${theme}: 未能从真实 ISW 表格解析关卡（${attempts.join("，")}）。调试页面已保存到 public/data/debug/${safeName(theme)}.html`);
 }
 
 function extractSquadsFromHtml(theme, html) {
   const result = [];
   const seen = new Set();
   const add = (name) => {
-    name = htmlText(name).replace(/^NEW\s*/i, "").trim();
+    const $fragment = cheerio.load(String(name ?? ""), null, false);
+    name = compactText($fragment.root().text()).replace(/^NEW\s*/i, "").trim();
     const match = name.match(/[A-Za-z0-9\u3400-\u9fff·²-]{2,20}分队/);
     if (!match) return;
     name = match[0];
@@ -680,15 +959,19 @@ async function syncSquads() {
 async function syncStages() {
   const all = [];
   const revisions = {};
+  const categoriesByTheme = {};
   for (const theme of ROGUELIKE_THEMES) {
     const data = await stageSection(theme);
     all.push(...data.stages);
     revisions[theme] = data.revid;
+    categoriesByTheme[theme] = categorySummary(data.stages);
     console.log(`Stages: ${theme} -> ${data.stages.length}`);
+    console.log(`  Categories: ${categoriesByTheme[theme].map((item) => `${item.name}(${item.count})`).join("、")}`);
     await new Promise((resolve) => setTimeout(resolve, 200));
   }
   await fs.writeFile(path.join(OUT, "stages.json"), JSON.stringify(all, null, 2));
-  return { count: all.length, byTheme: Object.fromEntries(ROGUELIKE_THEMES.map((theme) => [theme, all.filter((s) => s.theme === theme).length])), revisions };
+  await fs.writeFile(path.join(OUT, "stage-categories.json"), JSON.stringify(categoriesByTheme, null, 2));
+  return { count: all.length, byTheme: Object.fromEntries(ROGUELIKE_THEMES.map((theme) => [theme, all.filter((s) => s.theme === theme).length])), categoriesByTheme, revisions };
 }
 
 try {

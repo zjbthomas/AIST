@@ -20,20 +20,25 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Setup Node
+        uses: actions/setup-node@v6
         with:
-          node-version: 22
-          cache: npm
-      - run: npm install
+          node-version: 24
+      - name: Install dependencies
+        run: npm install
       - name: Refresh PRTS data
         run: npm run sync:prts
       - name: Build
         run: npm run build --ignore-scripts
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
         with:
           path: dist
+
   deploy:
     environment:
       name: github-pages

@@ -3,6 +3,11 @@ export type Stage = {
   theme: string;
   name: string;
   floor: number;
+  sectionCode: string;
+  sectionName: string;
+  categoryId: string;
+  categoryName: string;
+  variant: string;
   prtsUrl: string;
 };
 
@@ -26,21 +31,20 @@ export const squads = [
   "破坏战术分队",
 ];
 
-const makeStage = (theme: string, floor: number, name: string): Stage => ({
-  id: `${theme}-${floor}-${name}`,
+const makeStage = (theme: string, floor: number, name: string, variant: "normal" | "emergency" = "normal"): Stage => ({
+  id: `${theme}|ISW-NO|${floor}|${variant}|${name}`,
   theme,
   name,
   floor,
+  sectionCode: "ISW-NO",
+  sectionName: "一般作战 & 紧急作战",
+  categoryId: `ISW-NO:${variant}`,
+  categoryName: variant === "normal" ? "一般作战" : "紧急作战",
+  variant,
   prtsUrl: `https://prts.wiki/w/${encodeURIComponent(name)}`,
 });
 
 export const stages: Stage[] = themes.flatMap((theme) => [
-  makeStage(theme, 1, "驯兽小屋"),
-  makeStage(theme, 1, "共生"),
-  makeStage(theme, 2, "射手部队"),
-  makeStage(theme, 2, "意外"),
-  makeStage(theme, 3, "据险固守"),
-  makeStage(theme, 3, "紧急运输"),
-  makeStage(theme, 4, "寒灾之咒"),
-  makeStage(theme, 5, "最终调查"),
+  makeStage(theme, 1, "驯兽小屋", "normal"),
+  makeStage(theme, 1, "驯兽小屋", "emergency"),
 ]);

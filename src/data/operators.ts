@@ -3,16 +3,18 @@ export type Operator = {
   id: string;
   name: string;
   rarity: 1 | 2 | 3 | 4 | 5 | 6;
+  profession?: string;
   avatar: string;
   skills: OperatorSkill[];
   prtsUrl: string;
 };
 
 const redirect = (filename: string) => `https://prts.wiki/index.php?title=Special:Redirect/file/${encodeURIComponent(filename)}`;
-const op = (name: string, rarity: Operator["rarity"], skillNames: string[] = []): Operator => ({
+const op = (name: string, rarity: Operator["rarity"], skillNames: string[] = [], profession = "WARRIOR"): Operator => ({
   id: name,
   name,
   rarity,
+  profession,
   avatar: redirect(`头像_${name}.png`),
   skills: skillNames.slice(0, 3).map((skillName, i) => ({
     index: (i + 1) as 1 | 2 | 3,
