@@ -21,6 +21,7 @@ export type CellState = {
   elite?: Elite;
   promotionAfter?: 2;
   skill?: Skill;
+  formId?: string;
 };
 
 export type RunOperator = {

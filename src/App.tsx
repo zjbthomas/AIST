@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { pinyin } from "pinyin-pro";
 import { Copy, Download, ExternalLink, FolderOpen, GripVertical, Library, Pencil, Plus, Trash2, Upload, X } from "lucide-react";
-import { fallbackOperators, type Operator } from "./data/operators";
+import { fallbackOperators, type Operator, type OperatorForm } from "./data/operators";
 import { squads as fallbackSquads, stages as fallbackStages, themes, type Stage } from "./data/stages";
 import type { CellState, Elite, RunOperator, RunState, Skill, TimelineNode, TrackerStore } from "./types";
 
@@ -33,6 +33,33 @@ const PROFESSION_ALIASES: Record<string, string> = {
   SPECIAL: "SPECIALIST", SPECIALIST: "SPECIALIST", 特种: "SPECIALIST",
 };
 const normalizeProfession = (value?: string) => PROFESSION_ALIASES[String(value ?? "").trim()] ?? PROFESSION_ALIASES[String(value ?? "").trim().toUpperCase()] ?? String(value ?? "").trim().toUpperCase();
+
+function amiyaFormLabel(profession?: string) {
+  const normalized = normalizeProfession(profession);
+  return PROFESSIONS.find((item) => item.id === normalized)?.label ?? "未知形态";
+}
+
+function mergeSpecialOperators(source: Operator[]): Operator[] {
+  const amiya = source.filter((op) => /^阿米娅(?:$|[（(])/.test(op.name));
+  const others = source.filter((op) => !/^阿米娅(?:$|[（(])/.test(op.name));
+  if (!amiya.length) return source;
+  const forms: OperatorForm[] = amiya.map((op) => ({
+    id: op.id,
+    name: amiyaFormLabel(op.profession),
+    profession: normalizeProfession(op.profession),
+    avatar: op.avatar,
+    skills: op.skills,
+    prtsUrl: op.prtsUrl,
+  })).sort((a,b)=>["CASTER","MEDIC","GUARD"].indexOf(a.profession ?? "")-["CASTER","MEDIC","GUARD"].indexOf(b.profession ?? ""));
+  const base = amiya.find((op) => normalizeProfession(op.profession) === "CASTER") ?? amiya[0];
+  const merged: Operator = { ...base, id: "阿米娅", name: "阿米娅", profession: forms[0]?.profession ?? base.profession, avatar: forms[0]?.avatar ?? base.avatar, skills: forms[0]?.skills ?? base.skills, prtsUrl: base.prtsUrl, forms };
+  return [...others, merged];
+}
+
+function operatorForForm(operator: Operator, formId?: string): Operator {
+  const form = operator.forms?.find((item) => item.id === formId) ?? operator.forms?.[0];
+  return form ? { ...operator, id: `${operator.id}::${form.id}`, name: `${operator.name}（${form.name}）`, profession: form.profession, avatar: form.avatar, skills: form.skills, prtsUrl: form.prtsUrl, forms: undefined } : operator;
+}
 
 function operatorSearchText(operator: Operator) {
   const full = pinyin(operator.name, { toneType: "none", type: "array" }).join("");
@@ -79,6 +106,18 @@ function cloneRun(source: RunState, suffix = " - 副本"): RunState {
   return { ...cloned, id: uid(), name: `${source.name}${suffix}`, createdAt, updatedAt: createdAt };
 }
 
+function migrateSpecialRun(run: RunState): RunState {
+  const amiyaRows=run.operators.filter((row)=>/^阿米娅(?:$|[（(])/.test(row.operatorId));
+  if (amiyaRows.length<=1 || (amiyaRows.length===1&&amiyaRows[0].operatorId==="阿米娅")) return run;
+  const cells:Record<string,CellState>={};
+  for (const row of amiyaRows) {
+    for (const [nodeId,cell] of Object.entries(row.cells)) {
+      cells[nodeId]={...cells[nodeId],...cell,formId:cell.formId??row.operatorId};
+    }
+  }
+  return {...run,operators:[...run.operators.filter((row)=>!/^阿米娅(?:$|[（(])/.test(row.operatorId)),{operatorId:"阿米娅",cells}]};
+}
+
 function createRun(name = `新记录 ${new Date().toLocaleString("zh-CN")}`): RunState {
   return {
     id: uid(), name, theme: themes[0], squad: fallbackSquads[0], createdAt: now(), updatedAt: now(),
@@ -89,7 +128,7 @@ function createRun(name = `新记录 ${new Date().toLocaleString("zh-CN")}`): Ru
 function loadStore(): TrackerStore {
   try {
     const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null") as TrackerStore | null;
-    if (parsed?.schemaVersion === 2 && parsed.runs.length) return parsed;
+    if (parsed?.schemaVersion === 2 && parsed.runs.length) return { ...parsed, runs: parsed.runs.map(migrateSpecialRun) };
   } catch { /* ignore damaged local data */ }
   const run = createRun();
   return { schemaVersion: 2, activeRunId: run.id, runs: [run] };
@@ -97,7 +136,7 @@ function loadStore(): TrackerStore {
 
 function App() {
   const [store, setStore] = useState<TrackerStore>(loadStore);
-  const [operators, setOperators] = useState<Operator[]>(fallbackOperators);
+  const [operators, setOperators] = useState<Operator[]>(mergeSpecialOperators(fallbackOperators));
   const [stages, setStages] = useState<Stage[]>(fallbackStages);
   const [squads, setSquads] = useState<{ id: string; theme: string; name: string }[]>(themes.flatMap((theme) => fallbackSquads.map((name) => ({ id: `${theme}|${name}`, theme, name }))));
   const [nodeTypes, setNodeTypes] = useState<NodeTypeOption[]>(themes.flatMap((theme) => FALLBACK_OTHER_NODE_TYPES.map((item) => ({ ...item, theme, id: `${theme}|${item.id}` }))));
@@ -123,6 +162,7 @@ function App() {
   const [operatorAvailability, setOperatorAvailability] = useState<"all" | "available" | "added">("available");
   const [operatorPickerSort, setOperatorPickerSort] = useState<"rarity-desc" | "rarity-asc" | "name-asc">("rarity-desc");
   const [sortBy, setSortBy] = useState<"recruit" | "rarity" | "deploy">("recruit");
+  const [simplifiedTimeline, setSimplifiedTimeline] = useState(false);
   const importRef = useRef<HTMLInputElement>(null);
   const draggedOperatorId = useRef<string | null>(null);
   const draggedNodeId = useRef<string | null>(null);
@@ -158,7 +198,7 @@ function App() {
       fetch(asset("data/node-types.json"), { cache: "no-cache" }).then((r) => r.ok ? r.json() : []),
       fetch(asset("data/manifest.json"), { cache: "no-cache" }).then((r) => r.ok ? r.json() : null),
     ]).then(([opData, stageData, squadData, nodeTypeData, manifest]) => {
-      if (Array.isArray(opData) && opData.length) setOperators(opData.map((op: Operator) => ({ ...op, profession: normalizeProfession(op.profession) })));
+      if (Array.isArray(opData) && opData.length) setOperators(mergeSpecialOperators(opData.map((op: Operator) => ({ ...op, profession: normalizeProfession(op.profession) }))));
       if (Array.isArray(stageData) && stageData.length) setStages(stageData.map((stage: Stage & { battleType?: string }) => ({
         ...stage,
         sectionCode: stage.sectionCode ?? "LEGACY",
@@ -186,7 +226,7 @@ function App() {
             const parsed = await response.json() as RunState | TrackerStore;
             const run = "runs" in parsed ? parsed.runs[0] : parsed;
             if (!run?.id || !Array.isArray(run.nodes) || !Array.isArray(run.operators)) throw new Error("记录格式错误");
-            loaded.push({ ...item, run });
+            loaded.push({ ...item, run: migrateSpecialRun(run) });
           } catch (error) {
             console.warn(`无法加载预设 ${item.name}:`, error);
           }
@@ -280,7 +320,7 @@ function App() {
         if (!previousCombatNode) return row;
         const previous = row.cells[previousCombatNode.id] ?? {};
         const inherited: CellState = previous.deployed
-          ? { deployed: true, skill: previous.skill }
+          ? { deployed: true, skill: previous.skill, formId: previous.formId }
           : {};
         return Object.keys(inherited).length
           ? { ...row, cells: { ...row.cells, [node.id]: inherited } }
@@ -400,7 +440,7 @@ function App() {
     file.text().then((text) => {
       const parsed = JSON.parse(text) as TrackerStore;
       if (parsed.schemaVersion !== 2 || !Array.isArray(parsed.runs)) throw new Error("格式不正确");
-      setStore(parsed); setShowRunManager(false);
+      setStore({ ...parsed, runs: parsed.runs.map(migrateSpecialRun) }); setShowRunManager(false);
     }).catch((error) => alert(`读取失败：${error.message}`));
   }
   function copyPreset(preset: LoadedPreset) {
@@ -428,7 +468,8 @@ function App() {
       <label>记录名称<input disabled={isPresetPreview} value={run.name} onChange={(e) => updateRun((r) => ({ ...r, name: e.target.value }))}/></label>
       <label>集成战略<select disabled={isPresetPreview || hasTimelineData} title={hasTimelineData ? "已有干员或关卡时不能更改集成战略；请先一键清除" : undefined} value={run.theme} onChange={(e) => { const theme = e.target.value; const firstSquad = squads.find((item) => item.theme === theme)?.name ?? fallbackSquads[0]; updateRun((r) => ({ ...r, theme, squad: firstSquad })); }}>{themes.map((x) => <option key={x}>{x}</option>)}</select></label>
       <label>分队<select disabled={isPresetPreview} value={run.squad} onChange={(e) => updateRun((r) => ({ ...r, squad: e.target.value }))}>{availableSquads.map((x) => <option key={x.id} value={x.name}>{x.name}</option>)}</select></label>
-      <label>行排序<select value={sortBy} onChange={(e) => setSortBy(e.target.value as typeof sortBy)}><option value="recruit">添加顺序</option><option value="rarity">星级降序</option><option value="deploy">编队次数</option></select></label>
+      <label>行排序<select disabled={simplifiedTimeline} value={sortBy} onChange={(e) => setSortBy(e.target.value as typeof sortBy)}><option value="recruit">添加顺序</option><option value="rarity">星级降序</option><option value="deploy">编队次数</option></select></label>
+      <label className="timeline-view-toggle"><span>时间线视图</span><span className="check-row"><input type="checkbox" checked={simplifiedTimeline} onChange={(e)=>setSimplifiedTimeline(e.target.checked)}/><span>仅显示招募</span></span></label>
       <div className="toolbar-actions"><button disabled={isPresetPreview} onClick={() => setShowOperatorPicker(true)}><Plus size={16}/> 添加干员</button><button disabled={isPresetPreview} onClick={() => setShowStagePicker(true)}><Plus size={16}/> 添加关卡</button><button disabled={isPresetPreview} onClick={() => setShowNodePicker(true)}><Plus size={16}/> 添加其它节点</button><button className="danger-button" disabled={isPresetPreview || !hasTimelineData} onClick={clearOperatorsAndStages}><Trash2 size={16}/> 一键清除干员和关卡</button></div>
     </section>
 
@@ -481,7 +522,23 @@ function App() {
           </div>
         </div>
       ))}
-      {sortedRows.map((row)=>{const op=operatorMap[row.operatorId]; return op?<TimelineRow key={row.operatorId} row={row} operator={op} nodes={run.nodes} onRemove={()=>updateRun(r=>({...r,operators:r.operators.filter(x=>x.operatorId!==row.operatorId)}))} onEdit={(nodeId)=>{if(!isPresetPreview)setEditingCell({operatorId:row.operatorId,nodeId});}} readOnly={isPresetPreview} onRowDragStart={()=>{draggedOperatorId.current=row.operatorId;}} onRowDrop={()=>{if(draggedOperatorId.current)moveOperatorRow(draggedOperatorId.current,row.operatorId);draggedOperatorId.current=null;}} onMoveCell={(sourceNodeId,targetNodeId)=>moveCellState(row.operatorId,sourceNodeId,targetNodeId)}/>:null;})}
+      {simplifiedTimeline ? <>
+        <div className="operator-label sticky-left simplified-row-label"><strong>本节点招募</strong><span>按节点纵向显示</span></div>
+        {run.nodes.map((node,nodeIndex)=>{
+          const recruited=run.operators.flatMap((row)=>{
+            const state=row.cells[node.id];
+            const operator=operatorMap[row.operatorId];
+            if(!state?.recruitType||!operator)return [];
+            const formId=resolveEffectiveFormId(operator,row,run.nodes,nodeIndex);
+            return [{row,state,operator:operatorForForm(operator,formId)}];
+          });
+          return <div key={`simple-${node.id}`} className="simplified-recruit-cell">
+            {recruited.length?recruited.map(({row,state,operator})=><button key={row.operatorId} className="simplified-recruit-avatar" title={`${operator.name} · ${state.recruitType==="temporary"?"临时招募":"普通招募"}`} onClick={()=>{if(!isPresetPreview)setEditingCell({operatorId:row.operatorId,nodeId:node.id});}}>
+              <OperatorAvatar operator={operator} state={state} recruitedHere size={54}/>
+            </button>):<span className="simplified-empty">—</span>}
+          </div>;
+        })}
+      </> : sortedRows.map((row)=>{const op=operatorMap[row.operatorId]; return op?<TimelineRow key={row.operatorId} row={row} operator={op} nodes={run.nodes} onRemove={()=>updateRun(r=>({...r,operators:r.operators.filter(x=>x.operatorId!==row.operatorId)}))} onEdit={(nodeId)=>{if(!isPresetPreview)setEditingCell({operatorId:row.operatorId,nodeId});}} readOnly={isPresetPreview} onRowDragStart={()=>{draggedOperatorId.current=row.operatorId;}} onRowDrop={()=>{if(draggedOperatorId.current)moveOperatorRow(draggedOperatorId.current,row.operatorId);draggedOperatorId.current=null;}} onMoveCell={(sourceNodeId,targetNodeId)=>moveCellState(row.operatorId,sourceNodeId,targetNodeId)}/>:null;})}
     </div></div></section>
     <Stats run={run} operatorMap={operatorMap}/>
     <AggregateStats store={store} presets={presets} operatorMap={operatorMap}/>
@@ -535,7 +592,7 @@ function App() {
 }
 
 function TimelineRow({row,operator,nodes,onRemove,onEdit,readOnly=false,onRowDragStart,onRowDrop,onMoveCell}:{row:RunOperator;operator:Operator;nodes:TimelineNode[];onRemove:()=>void;onEdit:(id:string)=>void;readOnly?:boolean;onRowDragStart:()=>void;onRowDrop:()=>void;onMoveCell:(sourceNodeId:string,targetNodeId:string)=>void}) {
-  return <><div className="operator-label sticky-left" onDragOver={(event)=>{if(event.dataTransfer.types.includes("application/x-aist-row"))event.preventDefault();}} onDrop={(event)=>{if(event.dataTransfer.types.includes("application/x-aist-row")){event.preventDefault();onRowDrop();}}}><span className="row-drag-handle" draggable={!readOnly} onDragStart={(event)=>{event.stopPropagation();event.dataTransfer.effectAllowed="move";event.dataTransfer.setData("application/x-aist-row",operator.id);event.dataTransfer.setData("text/plain",`row:${operator.id}`);onRowDragStart();}} title="拖动调整干员行顺序"><GripVertical size={18}/></span><OperatorAvatar operator={operator} size={50}/><div className="operator-text"><span>{operator.name}</span><span>{operator.rarity}★ · 编队 {countDeploys(row)} · 部署 {countUses(row)}</span></div><a className="operator-prts-link" href={operator.prtsUrl} target="_blank" rel="noreferrer" title="在 PRTS 查看干员"><ExternalLink size={15}/></a>{!readOnly&&<button onClick={onRemove}><X size={15}/></button>}</div>{nodes.map((node,index)=>{const state=row.cells[node.id]??{};const hasState=Object.keys(state).length>0;const recruitedIndex=nodes.findIndex(n=>Boolean(row.cells[n.id]?.recruitType));const owned=recruitedIndex>=0&&index>=recruitedIndex;const effective=resolveEffectiveState(row,nodes,index);return <button key={node.id} className={`timeline-cell ${owned?"owned":""} ${readOnly?"readonly":""}`} draggable={!readOnly&&hasState} onDragStart={(event)=>{if(!hasState)return;event.stopPropagation();event.dataTransfer.effectAllowed="move";event.dataTransfer.setData("application/x-aist-cell",JSON.stringify({operatorId:operator.id,nodeId:node.id}));event.dataTransfer.setData("text/plain",JSON.stringify({operatorId:operator.id,nodeId:node.id}));}} onDragOver={(event)=>{if(!readOnly&&!hasState&&event.dataTransfer.types.includes("application/x-aist-cell")){event.preventDefault();event.dataTransfer.dropEffect="move";}}} onDrop={(event)=>{if(readOnly||hasState)return;const raw=event.dataTransfer.getData("application/x-aist-cell")||event.dataTransfer.getData("text/plain");if(!raw||raw.startsWith("row:"))return;event.preventDefault();event.stopPropagation();try{const payload=JSON.parse(raw);if(payload.operatorId===operator.id)onMoveCell(payload.nodeId,node.id);}catch{}}} onClick={()=>onEdit(node.id)}>{owned&&<span className="connector"/>}{(state.recruitType||state.deployed)&&<OperatorAvatar operator={operator} state={{...state,elite:effective.elite,recruitType:effective.recruitType}} recruitedHere={Boolean(state.recruitType)} usedHere={Boolean(state.used)} size={68}/>} {state.promotionAfter===2&&<span className="promotion-after" title="此节点后晋升精英化二"><span>→</span><img src={asset("icons/elite-2.svg")} alt="节点后晋升精英化二"/></span>}</button>;})}</>;
+  return <><div className="operator-label sticky-left" onDragOver={(event)=>{if(event.dataTransfer.types.includes("application/x-aist-row"))event.preventDefault();}} onDrop={(event)=>{if(event.dataTransfer.types.includes("application/x-aist-row")){event.preventDefault();onRowDrop();}}}><span className="row-drag-handle" draggable={!readOnly} onDragStart={(event)=>{event.stopPropagation();event.dataTransfer.effectAllowed="move";event.dataTransfer.setData("application/x-aist-row",operator.id);event.dataTransfer.setData("text/plain",`row:${operator.id}`);onRowDragStart();}} title="拖动调整干员行顺序"><GripVertical size={18}/></span><OperatorAvatar operator={operator} size={50}/><div className="operator-text"><span>{operator.name}</span><span>{operator.rarity}★ · 编队 {countDeploys(row)} · 部署 {countUses(row)}</span></div><a className="operator-prts-link" href={operator.prtsUrl} target="_blank" rel="noreferrer" title="在 PRTS 查看干员"><ExternalLink size={15}/></a>{!readOnly&&<button onClick={onRemove}><X size={15}/></button>}</div>{nodes.map((node,index)=>{const state=row.cells[node.id]??{};const hasState=Object.keys(state).length>0;const recruitedIndex=nodes.findIndex(n=>Boolean(row.cells[n.id]?.recruitType));const owned=recruitedIndex>=0&&index>=recruitedIndex;const effective=resolveEffectiveState(row,nodes,index);return <button key={node.id} className={`timeline-cell ${owned?"owned":""} ${readOnly?"readonly":""}`} draggable={!readOnly&&hasState} onDragStart={(event)=>{if(!hasState)return;event.stopPropagation();event.dataTransfer.effectAllowed="move";event.dataTransfer.setData("application/x-aist-cell",JSON.stringify({operatorId:operator.id,nodeId:node.id}));event.dataTransfer.setData("text/plain",JSON.stringify({operatorId:operator.id,nodeId:node.id}));}} onDragOver={(event)=>{if(!readOnly&&!hasState&&event.dataTransfer.types.includes("application/x-aist-cell")){event.preventDefault();event.dataTransfer.dropEffect="move";}}} onDrop={(event)=>{if(readOnly||hasState)return;const raw=event.dataTransfer.getData("application/x-aist-cell")||event.dataTransfer.getData("text/plain");if(!raw||raw.startsWith("row:"))return;event.preventDefault();event.stopPropagation();try{const payload=JSON.parse(raw);if(payload.operatorId===operator.id)onMoveCell(payload.nodeId,node.id);}catch{}}} onClick={()=>onEdit(node.id)}>{owned&&<span className="connector"/>}{(state.recruitType||state.deployed)&&<OperatorAvatar operator={operatorForForm(operator, resolveEffectiveFormId(operator,row,nodes,index))} state={{...state,elite:effective.elite,recruitType:effective.recruitType}} recruitedHere={Boolean(state.recruitType)} usedHere={Boolean(state.used)} size={68}/>} {state.promotionAfter===2&&<span className="promotion-after" title="此节点后晋升精英化二"><span>→</span><img src={asset("icons/elite-2.svg")} alt="节点后晋升精英化二"/></span>}</button>;})}</>;
 }
 
 function OperatorAvatar({operator,state,size=58,recruitedHere=false,usedHere=false}:{operator:Operator;state?:CellState;size?:number;recruitedHere?:boolean;usedHere?:boolean}) {
@@ -577,12 +634,15 @@ function CellEditor({operator,node,row,nodes,onChange,onClose}:{operator:Operato
   const recruitIndex=nodes.findIndex(n=>Boolean(row.cells[n.id]?.recruitType));
   const alreadyRecruited=recruitIndex>=0&&recruitIndex!==index;
   const effective=resolveEffectiveState(row,nodes,index);
-  const availableSkills=[...operator.skills].sort((a,b)=>a.index-b.index);
+  const effectiveFormId=resolveEffectiveFormId(operator,row,nodes,index);
+  const activeOperator=operatorForForm(operator,state.formId ?? effectiveFormId);
+  const availableSkills=[...activeOperator.skills].sort((a,b)=>a.index-b.index);
   const firstSkill=availableSkills[0]?.index;
   const isCombatNode=node.type==="combat";
   const canPromoteAfter=Boolean(effective.recruitType)&&effective.elite===1;
   return <Modal title={`${operator.name} · ${node.name}`} onClose={onClose}><div className="editor-form">
     <div><div className="field-title">招募方式（只能选择一次）</div><div className="segmented"><button disabled={alreadyRecruited} className={state.recruitType==="normal"?"active":""} onClick={()=>state.recruitType==="normal"?onChange({recruitType:undefined,elite:undefined,deployed:undefined,skill:undefined,promotionAfter:undefined}):onChange({recruitType:"normal",elite:state.elite??1})}>普通招募</button><button disabled={alreadyRecruited} className={state.recruitType==="temporary"?"active":""} onClick={()=>state.recruitType==="temporary"?onChange({recruitType:undefined,elite:undefined,deployed:undefined,skill:undefined,promotionAfter:undefined}):onChange({recruitType:"temporary",elite:state.elite??1})}>临时招募</button></div>{alreadyRecruited&&<p className="hint">该干员已经在更早的节点招募，不能再次招募。</p>}</div>
+    {operator.forms?.length?<div><div className="field-title">当前形态</div><div className="segmented form-options">{operator.forms.map((form)=><button key={form.id} className={(state.formId ?? effectiveFormId)===form.id?"active":""} onClick={()=>{const next=operatorForForm(operator,form.id);onChange({formId:form.id,skill:state.deployed?next.skills[0]?.index:undefined});}}><img src={form.avatar||asset("icons/operator-fallback.svg")}/><span>{form.name}</span></button>)}</div><p className="hint">阿米娅只招募一次；每个节点可以选择当前使用的形态，技能会随形态切换。</p></div>:null}
     {state.recruitType&&<div><div className="field-title">招募时精英化状态</div><div className="segmented image-options"><button className={(state.elite??1)===1?"active":""} onClick={()=>onChange({elite:1})}><img src={asset("icons/elite-1.svg")}/><span>精英化一</span></button><button className={state.elite===2?"active":""} onClick={()=>onChange({elite:2,promotionAfter:undefined})}><img src={asset("icons/elite-2.svg")}/><span>直接精英化二</span></button></div><p className="hint">招募时可以直接获得精英化一或精英化二，不要求先精一再晋升。</p></div>}
     {isCombatNode&&<label className="check-row"><input type="checkbox" checked={Boolean(state.deployed)} disabled={!effective.recruitType} onChange={(e)=>onChange({deployed:e.target.checked,skill:e.target.checked?(state.skill??firstSkill):undefined,used:e.target.checked?state.used:undefined})}/> 本关编队</label>}
     {isCombatNode&&state.deployed&&<label className="check-row"><input type="checkbox" checked={Boolean(state.used)} onChange={(e)=>onChange({used:e.target.checked})}/> 本关部署</label>}
@@ -607,29 +667,32 @@ function Stats({run,operatorMap}:{run:RunState;operatorMap:Record<string,Operato
 
   const rows = useMemo(() => {
     const nodeIndex = new Map(run.nodes.map((node, index) => [node.id, index]));
-    const baseRows = run.operators.map((row, rowIndex) => {
-      const op = operatorMap[row.operatorId];
-      if (!op) return null;
+    const baseRows = run.operators.flatMap((row, rowIndex) => {
+      const operator = operatorMap[row.operatorId];
+      if (!operator) return [];
       const recruitEntries = Object.entries(row.cells)
         .filter(([, cell]) => Boolean(cell.recruitType))
         .map(([nodeId, cell]) => ({ nodeIndex: nodeIndex.get(nodeId) ?? Number.MAX_SAFE_INTEGER, recruitType: cell.recruitType! }))
         .sort((a, b) => a.nodeIndex - b.nodeIndex);
       const firstRecruit = recruitEntries[0];
-      return {
-        rowIndex,
-        row,
-        op,
-        profession: normalizeProfession(op.profession),
-        professionLabel: PROFESSIONS.find((item) => item.id === normalizeProfession(op.profession))?.label ?? "未知职业",
-        recruitType: firstRecruit?.recruitType,
-        recruitIndex: firstRecruit?.nodeIndex ?? Number.MAX_SAFE_INTEGER,
-        deploys: countDeploys(row),
-        uses: countUses(row),
-        s1: countSkill(row, 1),
-        s2: countSkill(row, 2),
-        s3: countSkill(row, 3),
-      };
-    }).filter((item): item is NonNullable<typeof item> => Boolean(item));
+      const forms = operator.forms?.length ? operator.forms : [undefined];
+      return forms.map((form) => {
+        const op = form ? operatorForForm(operator, form.id) : operator;
+        const formId = form?.id;
+        return {
+          rowIndex, row, op, formId,
+          profession: normalizeProfession(op.profession),
+          professionLabel: PROFESSIONS.find((item) => item.id === normalizeProfession(op.profession))?.label ?? "未知职业",
+          recruitType: firstRecruit?.recruitType,
+          recruitIndex: firstRecruit?.nodeIndex ?? Number.MAX_SAFE_INTEGER,
+          deploys: countDeploysForForm(operator,row,run.nodes,formId),
+          uses: countUsesForForm(operator,row,run.nodes,formId),
+          s1: countSkillForForm(operator,row,run.nodes,formId,1),
+          s2: countSkillForForm(operator,row,run.nodes,formId,2),
+          s3: countSkillForForm(operator,row,run.nodes,formId,3),
+        };
+      });
+    });
 
     // “一抓 / 二抓 / 三抓”只统计同职业的六星普通招募。
     // 临时招募不会占用正式抓位；同一节点同时招募时按干员行顺序稳定排序。
@@ -688,6 +751,9 @@ type AggregateRow = {
   temporaryDeploy: number;
   totalDeploy: number;
   totalUsed: number;
+  firstPick: number;
+  secondPick: number;
+  thirdPick: number;
   runsSeen: number;
 };
 
@@ -698,7 +764,7 @@ function AggregateStats({store,presets,operatorMap}:{store:TrackerStore;presets:
   const [theme, setTheme] = useState("all");
   const [rarity, setRarity] = useState(0);
   const [recruitFilter, setRecruitFilter] = useState<"all"|"normal"|"temporary">("all");
-  const [sort, setSort] = useState<"normalRecruit"|"temporaryRecruit"|"totalDeploy"|"totalUsed"|"temporaryDeploy"|"runsSeen"|"rarity"|"name">("normalRecruit");
+  const [sort, setSort] = useState<"normalRecruit"|"temporaryRecruit"|"totalDeploy"|"totalUsed"|"firstPick"|"secondPick"|"thirdPick"|"runsSeen"|"rarity"|"name">("normalRecruit");
   const [direction, setDirection] = useState<"desc"|"asc">("desc");
   const analysisInput = useRef<HTMLInputElement>(null);
 
@@ -715,30 +781,65 @@ function AggregateStats({store,presets,operatorMap}:{store:TrackerStore;presets:
     const map = new Map<string, AggregateRow>();
     for (const run of selectedRuns) {
       if (theme !== "all" && run.theme !== theme) continue;
+
+      // 计算本局每个职业六星干员的普通招募顺位。临时招募不占抓位。
+      const professionPickCounts = new Map<string, number>();
+      const pickRanks = new Map<string, 1 | 2 | 3>();
+      for (let nodeIndex = 0; nodeIndex < run.nodes.length; nodeIndex++) {
+        const node = run.nodes[nodeIndex];
+        for (const runOperator of run.operators) {
+          const cell = runOperator.cells[node.id];
+          if (cell?.recruitType !== "normal") continue;
+          const baseOperator = operatorMap[runOperator.operatorId];
+          if (!baseOperator) continue;
+          const formId = resolveEffectiveFormId(baseOperator, runOperator, run.nodes, nodeIndex);
+          const recruitedOperator = formId ? operatorForForm(baseOperator, formId) : baseOperator;
+          if (recruitedOperator.rarity !== 6) continue;
+          const profession = normalizeProfession(recruitedOperator.profession);
+          const rank = (professionPickCounts.get(profession) ?? 0) + 1;
+          professionPickCounts.set(profession, rank);
+          if (rank <= 3) pickRanks.set(`${runOperator.operatorId}:${node.id}`, rank as 1 | 2 | 3);
+        }
+      }
+
       for (const row of run.operators) {
-        const op = operatorMap[row.operatorId];
-        if (!op) continue;
-        let aggregate = map.get(op.id);
-        if (!aggregate) {
-          aggregate = { op, normalRecruit: 0, temporaryRecruit: 0, normalDeploy: 0, temporaryDeploy: 0, totalDeploy: 0, totalUsed: 0, runsSeen: 0 };
-          map.set(op.id, aggregate);
-        }
+        const operator = operatorMap[row.operatorId];
+        if (!operator) continue;
+        const forms = operator.forms?.length ? operator.forms : [undefined];
         const recruited = Object.values(row.cells).some((cell) => Boolean(cell.recruitType));
-        if (recruited) aggregate.runsSeen += 1;
-        for (const node of run.nodes) {
-          const cell = row.cells[node.id];
-          if (!cell) continue;
-          if (cell.recruitType === "normal") aggregate.normalRecruit += 1;
-          if (cell.recruitType === "temporary") aggregate.temporaryRecruit += 1;
-          if (cell.used) aggregate.totalUsed += 1;
-          if (cell.deployed) {
-            aggregate.totalDeploy += 1;
-            const nodeIndex = run.nodes.findIndex((candidate) => candidate.id === node.id);
-            const recruitType = resolveEffectiveState(row, run.nodes, nodeIndex).recruitType;
-            if (recruitType === "temporary") aggregate.temporaryDeploy += 1;
-            else aggregate.normalDeploy += 1;
+        forms.forEach((form, formIndex) => {
+          const op = form ? operatorForForm(operator, form.id) : operator;
+          const key = op.id;
+          let aggregate = map.get(key);
+          if (!aggregate) {
+            aggregate = { op, normalRecruit: 0, temporaryRecruit: 0, normalDeploy: 0, temporaryDeploy: 0, totalDeploy: 0, totalUsed: 0, firstPick: 0, secondPick: 0, thirdPick: 0, runsSeen: 0 };
+            map.set(key, aggregate);
           }
-        }
+          // 多形态干员共享同一次招募与抓位数据；编队、部署和技能仍按形态分别统计。
+          if (recruited) aggregate.runsSeen += 1;
+          for (let nodeIndex=0; nodeIndex<run.nodes.length; nodeIndex++) {
+            const node=run.nodes[nodeIndex];
+            const cell=row.cells[node.id];
+            if (!cell) continue;
+            if (cell.recruitType === "normal") aggregate.normalRecruit += 1;
+            if (cell.recruitType === "temporary") aggregate.temporaryRecruit += 1;
+            const currentForm=resolveEffectiveFormId(operator,row,run.nodes,nodeIndex);
+            if (cell.recruitType === "normal") {
+              const rank = pickRanks.get(`${row.operatorId}:${node.id}`);
+              if (rank === 1) aggregate.firstPick += 1;
+              else if (rank === 2) aggregate.secondPick += 1;
+              else if (rank === 3) aggregate.thirdPick += 1;
+            }
+            if (currentForm !== form?.id) continue;
+            if (cell.used) aggregate.totalUsed += 1;
+            if (cell.deployed) {
+              aggregate.totalDeploy += 1;
+              const effectiveRecruitType = resolveEffectiveState(row, run.nodes, nodeIndex).recruitType;
+              if (effectiveRecruitType === "temporary") aggregate.temporaryDeploy += 1;
+              else aggregate.normalDeploy += 1;
+            }
+          }
+        });
       }
     }
     const result = [...map.values()].filter((row) => {
@@ -794,14 +895,23 @@ function AggregateStats({store,presets,operatorMap}:{store:TrackerStore;presets:
       <select value={theme} onChange={(e)=>setTheme(e.target.value)}><option value="all">全部肉鸽</option>{themeOptions.map((value)=><option key={value}>{value}</option>)}</select>
       <select value={rarity} onChange={(e)=>setRarity(Number(e.target.value))}><option value={0}>全部星级</option>{[6,5,4,3,2,1].map((value)=><option key={value} value={value}>{value} 星</option>)}</select>
       <select value={recruitFilter} onChange={(e)=>setRecruitFilter(e.target.value as typeof recruitFilter)}><option value="all">全部招募类型</option><option value="normal">有普通招募</option><option value="temporary">有临时招募</option></select>
-      <select value={sort} onChange={(e)=>setSort(e.target.value as typeof sort)}><option value="normalRecruit">普通抓取次数</option><option value="temporaryRecruit">临时抓取次数</option><option value="totalDeploy">总编队次数</option><option value="totalUsed">部署次数</option><option value="temporaryDeploy">临时干员编队</option><option value="runsSeen">出现局数</option><option value="rarity">星级</option><option value="name">名称</option></select>
+      <select value={sort} onChange={(e)=>setSort(e.target.value as typeof sort)}><option value="normalRecruit">普通抓取次数</option><option value="temporaryRecruit">临时抓取次数</option><option value="totalDeploy">编队次数</option><option value="totalUsed">部署次数</option><option value="firstPick">同职业一抓次数</option><option value="secondPick">同职业二抓次数</option><option value="thirdPick">同职业三抓次数</option><option value="runsSeen">出现局数</option><option value="rarity">星级</option><option value="name">名称</option></select>
       <select value={direction} onChange={(e)=>setDirection(e.target.value as typeof direction)}><option value="desc">降序</option><option value="asc">升序</option></select>
     </div>
-    {rows.length?<div className="stats-table-wrap"><table><thead><tr><th>干员</th><th>星级</th><th>普通抓取</th><th>临时抓取</th><th>普通编队</th><th>临时编队</th><th>总编队</th><th>部署</th><th>出现局数</th></tr></thead><tbody>{rows.map((row)=><tr key={row.op.id}><td><div className="stats-operator"><OperatorAvatar operator={row.op} size={34}/><span>{row.op.name}</span></div></td><td>{row.op.rarity}</td><td>{row.normalRecruit}</td><td>{row.temporaryRecruit}</td><td>{row.normalDeploy}</td><td>{row.temporaryDeploy}</td><td>{row.totalDeploy}</td><td>{row.totalUsed}</td><td>{row.runsSeen}</td></tr>)}</tbody></table></div>:<p className="muted">当前筛选条件下没有数据。</p>}
+    {rows.length?<div className="stats-table-wrap"><table><thead><tr><th>干员</th><th>星级</th><th>普通抓取</th><th>临时抓取</th><th>编队</th><th>部署</th><th>同职业一抓</th><th>同职业二抓</th><th>同职业三抓</th><th>出现局数</th></tr></thead><tbody>{rows.map((row)=><tr key={row.op.id}><td><div className="stats-operator"><OperatorAvatar operator={row.op} size={34}/><span>{row.op.name}</span></div></td><td>{row.op.rarity}</td><td>{row.normalRecruit}</td><td>{row.temporaryRecruit}</td><td>{row.totalDeploy}</td><td>{row.totalUsed}</td><td>{row.op.rarity===6?row.firstPick:<span className="muted">—</span>}</td><td>{row.op.rarity===6?row.secondPick:<span className="muted">—</span>}</td><td>{row.op.rarity===6?row.thirdPick:<span className="muted">—</span>}</td><td>{row.runsSeen}</td></tr>)}</tbody></table></div>:<p className="muted">当前筛选条件下没有数据。</p>}
   </section>;
 }
 
 function Modal({title,children,onClose}:{title:string;children:React.ReactNode;onClose:()=>void}) { return <div className="modal-backdrop" onMouseDown={onClose}><div className="modal" onMouseDown={e=>e.stopPropagation()}><div className="modal-header"><h3>{title}</h3><button onClick={onClose}><X size={18}/></button></div>{children}</div></div> }
+function resolveEffectiveFormId(operator:Operator,row:RunOperator,nodes:TimelineNode[],index:number):string|undefined {
+  if (!operator.forms?.length) return undefined;
+  for (let i=index;i>=0;i--) {
+    const formId=row.cells[nodes[i]?.id]?.formId;
+    if (formId&&operator.forms.some((form)=>form.id===formId)) return formId;
+  }
+  return operator.forms[0]?.id;
+}
+
 function resolveEffectiveState(row:RunOperator,nodes:TimelineNode[],index:number):CellState {
   const result:CellState={};
   if(index<0)return result;
@@ -817,4 +927,7 @@ function resolveEffectiveState(row:RunOperator,nodes:TimelineNode[],index:number
   return result;
 }
 function countDeploys(row:RunOperator){return Object.values(row.cells).filter(c=>c.deployed).length;} function countUses(row:RunOperator){return Object.values(row.cells).filter(c=>c.used).length;} function countSkill(row:RunOperator,skill:Skill){return Object.values(row.cells).filter(c=>c.used&&c.skill===skill).length;}
+function countDeploysForForm(operator:Operator,row:RunOperator,nodes:TimelineNode[],formId?:string){return nodes.filter((node,index)=>row.cells[node.id]?.deployed&&resolveEffectiveFormId(operator,row,nodes,index)===formId).length;}
+function countUsesForForm(operator:Operator,row:RunOperator,nodes:TimelineNode[],formId?:string){return nodes.filter((node,index)=>row.cells[node.id]?.used&&resolveEffectiveFormId(operator,row,nodes,index)===formId).length;}
+function countSkillForForm(operator:Operator,row:RunOperator,nodes:TimelineNode[],formId:string|undefined,skill:Skill){return nodes.filter((node,index)=>{const cell=row.cells[node.id];return cell?.used&&cell.skill===skill&&resolveEffectiveFormId(operator,row,nodes,index)===formId;}).length;}
 export default App;

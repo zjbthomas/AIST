@@ -286,3 +286,31 @@ td { font-size: 14px; }
 @media (max-width: 650px) {
   .stats-controls { grid-template-columns: 1fr; }
 }
+
+.form-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
+}
+.form-options button {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 9px;
+}
+.form-options img {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+
+/* Simplified recruitment-only timeline */
+.timeline-view-toggle { min-width: 150px; }
+.timeline-view-toggle .check-row { min-height: 40px; padding: 0 10px; border: 1px solid #334155; border-radius: 10px; background: #0f172a; color: #e2e8f0; }
+.simplified-row-label { min-height: 104px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+.simplified-row-label span { color: #64748b; font-size: 11px; }
+.simplified-recruit-cell { min-height: 104px; padding: 8px 6px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 7px; background: rgba(15,23,42,.45); }
+.simplified-recruit-avatar { border: 0; padding: 0; background: transparent; border-radius: 999px; cursor: pointer; }
+.simplified-recruit-avatar:hover { transform: translateY(-1px); filter: brightness(1.08); }
+.simplified-empty { margin: auto; color: #475569; }

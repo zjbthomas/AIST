@@ -1,4 +1,5 @@
 export type OperatorSkill = { index: 1 | 2 | 3; name: string; icon: string };
+export type OperatorForm = { id: string; name: string; profession?: string; avatar: string; skills: OperatorSkill[]; prtsUrl: string };
 export type Operator = {
   id: string;
   name: string;
@@ -7,6 +8,7 @@ export type Operator = {
   avatar: string;
   skills: OperatorSkill[];
   prtsUrl: string;
+  forms?: OperatorForm[];
 };
 
 const redirect = (filename: string) => `https://prts.wiki/index.php?title=Special:Redirect/file/${encodeURIComponent(filename)}`;
