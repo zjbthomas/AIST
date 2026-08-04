@@ -1,0 +1,408 @@
+[
+  {
+    "id": "傀影与猩红孤钻|COMBAT OPS.",
+    "theme": "傀影与猩红孤钻",
+    "code": "COMBAT OPS.",
+    "name": "作战",
+    "kind": "combat"
+  },
+  {
+    "id": "傀影与猩红孤钻|EMERGENCY OPS.",
+    "theme": "傀影与猩红孤钻",
+    "code": "EMERGENCY OPS.",
+    "name": "紧急作战",
+    "kind": "combat"
+  },
+  {
+    "id": "傀影与猩红孤钻|DREADFUL FOE",
+    "theme": "傀影与猩红孤钻",
+    "code": "DREADFUL FOE",
+    "name": "险路恶敌",
+    "kind": "combat"
+  },
+  {
+    "id": "傀影与猩红孤钻|ENCOUNTER",
+    "theme": "傀影与猩红孤钻",
+    "code": "ENCOUNTER",
+    "name": "不期而遇",
+    "kind": "other"
+  },
+  {
+    "id": "傀影与猩红孤钻|WISH",
+    "theme": "傀影与猩红孤钻",
+    "code": "WISH",
+    "name": "古堡馈赠",
+    "kind": "other"
+  },
+  {
+    "id": "傀影与猩红孤钻|SAFE HOUSE",
+    "theme": "傀影与猩红孤钻",
+    "code": "SAFE HOUSE",
+    "name": "安全的角落",
+    "kind": "other"
+  },
+  {
+    "id": "傀影与猩红孤钻|DOWNTIME RECREATION",
+    "theme": "傀影与猩红孤钻",
+    "code": "DOWNTIME RECREATION",
+    "name": "幕间余兴",
+    "kind": "other"
+  },
+  {
+    "id": "傀影与猩红孤钻|ROGUE TRADER",
+    "theme": "傀影与猩红孤钻",
+    "code": "ROGUE TRADER",
+    "name": "诡意行商",
+    "kind": "other"
+  },
+  {
+    "id": "水月与深蓝之树|COMBAT OPS.",
+    "theme": "水月与深蓝之树",
+    "code": "COMBAT OPS.",
+    "name": "作战",
+    "kind": "combat"
+  },
+  {
+    "id": "水月与深蓝之树|EMERGENCY OPS.",
+    "theme": "水月与深蓝之树",
+    "code": "EMERGENCY OPS.",
+    "name": "紧急作战",
+    "kind": "combat"
+  },
+  {
+    "id": "水月与深蓝之树|DREADFUL FOE",
+    "theme": "水月与深蓝之树",
+    "code": "DREADFUL FOE",
+    "name": "险路恶敌",
+    "kind": "combat"
+  },
+  {
+    "id": "水月与深蓝之树|ENCOUNTER",
+    "theme": "水月与深蓝之树",
+    "code": "ENCOUNTER",
+    "name": "不期而遇",
+    "kind": "other"
+  },
+  {
+    "id": "水月与深蓝之树|SAFE HOUSE",
+    "theme": "水月与深蓝之树",
+    "code": "SAFE HOUSE",
+    "name": "安全的角落",
+    "kind": "other"
+  },
+  {
+    "id": "水月与深蓝之树|DOWNTIME RECREATION",
+    "theme": "水月与深蓝之树",
+    "code": "DOWNTIME RECREATION",
+    "name": "兴致盎然",
+    "kind": "other"
+  },
+  {
+    "id": "水月与深蓝之树|NEW ENCOUNTER",
+    "theme": "水月与深蓝之树",
+    "code": "NEW ENCOUNTER",
+    "name": "得偿所愿",
+    "kind": "other"
+  },
+  {
+    "id": "水月与深蓝之树|NEW ENCOUNTER",
+    "theme": "水月与深蓝之树",
+    "code": "NEW ENCOUNTER",
+    "name": "地区委托",
+    "kind": "other"
+  },
+  {
+    "id": "水月与深蓝之树|NEW ROGUE TRADER",
+    "theme": "水月与深蓝之树",
+    "code": "NEW ROGUE TRADER",
+    "name": "诡意行商",
+    "kind": "other"
+  },
+  {
+    "id": "水月与深蓝之树|ENCOUNTER",
+    "theme": "水月与深蓝之树",
+    "code": "ENCOUNTER",
+    "name": "风雨际会",
+    "kind": "other"
+  },
+  {
+    "id": "水月与深蓝之树|ENCOUNTER",
+    "theme": "水月与深蓝之树",
+    "code": "ENCOUNTER",
+    "name": "紧急运输",
+    "kind": "other"
+  },
+  {
+    "id": "水月与深蓝之树|ENCOUNTER",
+    "theme": "水月与深蓝之树",
+    "code": "ENCOUNTER",
+    "name": "误入奇境",
+    "kind": "other"
+  },
+  {
+    "id": "探索者的银凇止境|COMBAT OPS.",
+    "theme": "探索者的银凇止境",
+    "code": "COMBAT OPS.",
+    "name": "作战",
+    "kind": "combat"
+  },
+  {
+    "id": "探索者的银凇止境|EMERGENCY OPS.",
+    "theme": "探索者的银凇止境",
+    "code": "EMERGENCY OPS.",
+    "name": "紧急作战",
+    "kind": "combat"
+  },
+  {
+    "id": "探索者的银凇止境|THE ROOT",
+    "theme": "探索者的银凇止境",
+    "code": "THE ROOT",
+    "name": "险路恶敌",
+    "kind": "combat"
+  },
+  {
+    "id": "探索者的银凇止境|ENCOUNTER",
+    "theme": "探索者的银凇止境",
+    "code": "ENCOUNTER",
+    "name": "不期而遇",
+    "kind": "other"
+  },
+  {
+    "id": "探索者的银凇止境|SAFE HOUSE",
+    "theme": "探索者的银凇止境",
+    "code": "SAFE HOUSE",
+    "name": "安全的角落",
+    "kind": "other"
+  },
+  {
+    "id": "探索者的银凇止境|RECREATION",
+    "theme": "探索者的银凇止境",
+    "code": "RECREATION",
+    "name": "兴致盎然",
+    "kind": "other"
+  },
+  {
+    "id": "探索者的银凇止境|NEW PROPHECY",
+    "theme": "探索者的银凇止境",
+    "code": "NEW PROPHECY",
+    "name": "命运所指",
+    "kind": "other"
+  },
+  {
+    "id": "探索者的银凇止境|NEW WISH",
+    "theme": "探索者的银凇止境",
+    "code": "NEW WISH",
+    "name": "得偿所愿",
+    "kind": "other"
+  },
+  {
+    "id": "探索者的银凇止境|NEW ROGUE TRADER",
+    "theme": "探索者的银凇止境",
+    "code": "NEW ROGUE TRADER",
+    "name": "诡意行商",
+    "kind": "other"
+  },
+  {
+    "id": "探索者的银凇止境|LOST AND FOUND",
+    "theme": "探索者的银凇止境",
+    "code": "LOST AND FOUND",
+    "name": "失与得",
+    "kind": "other"
+  },
+  {
+    "id": "探索者的银凇止境|SCOUT",
+    "theme": "探索者的银凇止境",
+    "code": "SCOUT",
+    "name": "先行一步",
+    "kind": "other"
+  },
+  {
+    "id": "探索者的银凇止境|BOSKY PASSAGE",
+    "theme": "探索者的银凇止境",
+    "code": "BOSKY PASSAGE",
+    "name": "树篱之途",
+    "kind": "other"
+  },
+  {
+    "id": "萨卡兹的无终奇语|COMBAT OPS.",
+    "theme": "萨卡兹的无终奇语",
+    "code": "COMBAT OPS.",
+    "name": "作战",
+    "kind": "combat"
+  },
+  {
+    "id": "萨卡兹的无终奇语|EMERGENCY OPS.",
+    "theme": "萨卡兹的无终奇语",
+    "code": "EMERGENCY OPS.",
+    "name": "紧急作战",
+    "kind": "combat"
+  },
+  {
+    "id": "萨卡兹的无终奇语|THE ROOT",
+    "theme": "萨卡兹的无终奇语",
+    "code": "THE ROOT",
+    "name": "险路恶敌",
+    "kind": "combat"
+  },
+  {
+    "id": "萨卡兹的无终奇语|ENCOUNTER",
+    "theme": "萨卡兹的无终奇语",
+    "code": "ENCOUNTER",
+    "name": "不期而遇",
+    "kind": "other"
+  },
+  {
+    "id": "萨卡兹的无终奇语|SAFE HOUSE",
+    "theme": "萨卡兹的无终奇语",
+    "code": "SAFE HOUSE",
+    "name": "安全的角落",
+    "kind": "other"
+  },
+  {
+    "id": "萨卡兹的无终奇语|RECREATION",
+    "theme": "萨卡兹的无终奇语",
+    "code": "RECREATION",
+    "name": "兴致盎然",
+    "kind": "other"
+  },
+  {
+    "id": "萨卡兹的无终奇语|PROPHECY",
+    "theme": "萨卡兹的无终奇语",
+    "code": "PROPHECY",
+    "name": "命运所指",
+    "kind": "other"
+  },
+  {
+    "id": "萨卡兹的无终奇语|WISH",
+    "theme": "萨卡兹的无终奇语",
+    "code": "WISH",
+    "name": "得偿所愿",
+    "kind": "other"
+  },
+  {
+    "id": "萨卡兹的无终奇语|NEW IDEA FILTER",
+    "theme": "萨卡兹的无终奇语",
+    "code": "NEW IDEA FILTER",
+    "name": "去伪存真",
+    "kind": "other"
+  },
+  {
+    "id": "萨卡兹的无终奇语|NEW FACE OFF",
+    "theme": "萨卡兹的无终奇语",
+    "code": "NEW FACE OFF",
+    "name": "狭路相逢",
+    "kind": "other"
+  },
+  {
+    "id": "萨卡兹的无终奇语|NEW ROGUE TRADER",
+    "theme": "萨卡兹的无终奇语",
+    "code": "NEW ROGUE TRADER",
+    "name": "诡意行商",
+    "kind": "other"
+  },
+  {
+    "id": "萨卡兹的无终奇语|LOST AND FOUND",
+    "theme": "萨卡兹的无终奇语",
+    "code": "LOST AND FOUND",
+    "name": "失与得",
+    "kind": "other"
+  },
+  {
+    "id": "萨卡兹的无终奇语|SCOUT",
+    "theme": "萨卡兹的无终奇语",
+    "code": "SCOUT",
+    "name": "先行一步",
+    "kind": "other"
+  },
+  {
+    "id": "萨卡兹的无终奇语|POSSIBILITY",
+    "theme": "萨卡兹的无终奇语",
+    "code": "POSSIBILITY",
+    "name": "思维边界",
+    "kind": "other"
+  },
+  {
+    "id": "岁的界园志异|ENCOUNTER",
+    "theme": "岁的界园志异",
+    "code": "ENCOUNTER",
+    "name": "不期而遇",
+    "kind": "other"
+  },
+  {
+    "id": "岁的界园志异|WISH",
+    "theme": "岁的界园志异",
+    "code": "WISH",
+    "name": "得偿所愿",
+    "kind": "other"
+  },
+  {
+    "id": "岁的界园志异|SAFE HOUSE",
+    "theme": "岁的界园志异",
+    "code": "SAFE HOUSE",
+    "name": "安全屋",
+    "kind": "other"
+  },
+  {
+    "id": "岁的界园志异|DOWNTIME RECREATION",
+    "theme": "岁的界园志异",
+    "code": "DOWNTIME RECREATION",
+    "name": "幕间余兴",
+    "kind": "other"
+  },
+  {
+    "id": "岁的界园志异|ROGUE TRADER",
+    "theme": "岁的界园志异",
+    "code": "ROGUE TRADER",
+    "name": "诡意行商",
+    "kind": "other"
+  },
+  {
+    "id": "沉沦者的黑流树海|NEW",
+    "theme": "沉沦者的黑流树海",
+    "code": "NEW",
+    "name": "事件 险路尽头",
+    "kind": "other"
+  },
+  {
+    "id": "沉沦者的黑流树海|NEW",
+    "theme": "沉沦者的黑流树海",
+    "code": "NEW",
+    "name": "事件 险路小径",
+    "kind": "other"
+  },
+  {
+    "id": "沉沦者的黑流树海|NEW",
+    "theme": "沉沦者的黑流树海",
+    "code": "NEW",
+    "name": "商店 秘境行商",
+    "kind": "other"
+  },
+  {
+    "id": "沉沦者的黑流树海|NEW",
+    "theme": "沉沦者的黑流树海",
+    "code": "NEW",
+    "name": "商店 应急助力",
+    "kind": "other"
+  },
+  {
+    "id": "沉沦者的黑流树海|NEW",
+    "theme": "沉沦者的黑流树海",
+    "code": "NEW",
+    "name": "传送 曲折密道",
+    "kind": "other"
+  },
+  {
+    "id": "沉沦者的黑流树海|NEW",
+    "theme": "沉沦者的黑流树海",
+    "code": "NEW",
+    "name": "视野 羽瞰点",
+    "kind": "other"
+  },
+  {
+    "id": "沉沦者的黑流树海|NEW",
+    "theme": "沉沦者的黑流树海",
+    "code": "NEW",
+    "name": "<4+> “居民”据点",
+    "kind": "other"
+  }
+]
