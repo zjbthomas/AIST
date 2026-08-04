@@ -227,3 +227,5 @@ td { font-size: 14px; }
 .node-kind-options { flex-wrap:wrap; }
 .node-kind-options button { flex:1 1 120px; }
 .editor-form label input { width:100%; min-height:42px; margin-top:8px; border:1px solid #334155; border-radius:10px; background:#0f172a; color:#f8fafc; padding:0 12px; }
+
+.used-badge { position: absolute; right: -4px; top: -3px; width: 23px; height: 23px; display: grid; place-items: center; border-radius: 50%; background: #facc15; color: #422006; font-size: 15px; line-height: 1; font-weight: 1000; border: 3px solid #111827; z-index: 4; }

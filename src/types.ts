@@ -17,6 +17,7 @@ export type TimelineNode = {
 export type CellState = {
   recruitType?: "normal" | "temporary";
   deployed?: boolean;
+  used?: boolean;
   elite?: Elite;
   promotionAfter?: 2;
   skill?: Skill;
