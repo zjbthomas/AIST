@@ -9,6 +9,7 @@ export type Stage = {
   categoryName: string;
   variant: string;
   prtsUrl: string;
+  prtsUrls?: string[];
 };
 
 export const themes = [
@@ -42,6 +43,7 @@ const makeStage = (theme: string, floor: number, name: string, variant: "normal"
   categoryName: variant === "normal" ? "一般作战" : "紧急作战",
   variant,
   prtsUrl: `https://prts.wiki/w/${encodeURIComponent(name)}`,
+  prtsUrls: [`https://prts.wiki/w/${encodeURIComponent(name)}`],
 });
 
 export const stages: Stage[] = themes.flatMap((theme) => [

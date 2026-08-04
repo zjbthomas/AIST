@@ -676,6 +676,32 @@ function learnImageFloorMap($, rows) {
   return learned;
 }
 
+function stageCellName($, cell) {
+  const clone = $(cell).clone();
+  clone.find("sup").remove();
+  clone.find("br").replaceWith(" ");
+  clone.find("img,source,style,script").remove();
+  return cleanStageName(clone.text())
+    .replace(/\s*\/\s*/g, " / ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function stageLinksFromCell($, cell) {
+  const links = [];
+  const seen = new Set();
+  $(cell).find("a[href]").each((_, anchor) => {
+    const href = String($(anchor).attr("href") ?? "");
+    if (!href || href.startsWith("#") || /^(?:mailto|javascript):/i.test(href)) return;
+    if (!/(?:\/w\/|title=)ISW-/i.test(href)) return;
+    const url = normalizeStageHref(href);
+    if (!url || seen.has(url)) return;
+    seen.add(url);
+    links.push(url);
+  });
+  return links;
+}
+
 function stageRowsFromOrderedRows(theme, $, rows, sharedImageFloorMap = new Map()) {
   const output = [];
   const seen = new Set();
@@ -695,51 +721,61 @@ function stageRowsFromOrderedRows(theme, $, rows, sharedImageFloorMap = new Map(
     if (!sectionCode) continue;
 
     const cells = $(tr).children("th,td").toArray();
+    if (!cells.length || $(tr).children("th,td").find("table").length) continue;
+
     let explicitFloor;
-    for (const cell of cells) {
+    let floorCellIndex = -1;
+    for (let index = 0; index < cells.length; index++) {
+      const cell = cells[index];
       const floor = exactFloor($(cell).clone().find("sup").remove().end().text());
       if (floor !== undefined) {
         explicitFloor = floor;
+        floorCellIndex = index;
         currentFloor = floor;
         break;
       }
     }
 
-    // Some themes (notably 岁的界园志异) render floor labels as images.
-    // Resolve the image to an absolute floor using its own metadata or the map
-    // learned from the complete general/emergency section. Never assume that
-    // the first image in every section means floor 1: boss sections may begin
-    // at floor 3 or 5.
     if (explicitFloor === undefined && cells.length > 0) {
       const firstCell = $(cells[0]);
       const key = imageFloorKey($, firstCell);
       const imageFloor = floorFromImageMetadata($, firstCell) ?? imageFloorMap.get(key);
-      if (imageFloor !== undefined) currentFloor = imageFloor;
-      else if (firstCell.find("img,source").length > 0) currentFloor = 0;
+      if (imageFloor !== undefined) {
+        currentFloor = imageFloor;
+        floorCellIndex = 0;
+      } else if (firstCell.find("img,source").length > 0 && stageLinksFromCell($, firstCell).length === 0) {
+        currentFloor = 0;
+        floorCellIndex = 0;
+      }
     }
 
     const isNormalEmergency = /(?:一般|普通)作战/.test(sectionName) && /紧急作战/.test(sectionName);
-    $(tr).children("th,td").find("a[href]").each((__, anchor) => {
-      const href = String($(anchor).attr("href") ?? "");
-      const name = cleanStageName($(anchor).clone().find("sup").remove().end().text());
-      if (!name || name.length > 50 || NON_STAGE_NAMES.has(name)) return;
-      if (ROGUELIKE_THEMES.includes(name) || /^ISW-/i.test(name)) return;
-      if (/^(?:文件|File|分类|模板|用户|帮助)[:：]/i.test(name)) return;
-      if (href.startsWith("#") || /^(?:mailto|javascript):/i.test(href)) return;
-      if (!href.startsWith("/w/") && !href.startsWith("./") && !href.includes("title=") && !/^https?:\/\/(?:[^/]+\.)?prts\.wiki/i.test(href)) return;
-      if (!/(?:\/w\/|title=)ISW-/i.test(href)) return;
-      if (/^(?:单|双|普通|紧急)$/.test(name)) return;
+    const variants = isNormalEmergency
+      ? [
+          { id: "normal", name: "一般作战" },
+          { id: "emergency", name: "紧急作战" },
+        ]
+      : [{ id: "default", name: sectionName }];
 
-      const variants = isNormalEmergency
-        ? [
-            { id: "normal", name: "一般作战" },
-            { id: "emergency", name: "紧急作战" },
-          ]
-        : [{ id: "default", name: sectionName }];
+    // A PRTS table cell is one selectable stage. Some cells contain a shared
+    // title plus several variant links, e.g. “谤天 单座 / 二座”. Keep the
+    // complete visible cell text as the stage name and preserve every link.
+    for (let index = 0; index < cells.length; index++) {
+      if (index === floorCellIndex) continue;
+      const cell = cells[index];
+      const name = stageCellName($, cell);
+      const prtsUrls = stageLinksFromCell($, cell);
+      if (!name || name.length > 100 || NON_STAGE_NAMES.has(name)) continue;
+      if (ROGUELIKE_THEMES.includes(name) || /^ISW-/i.test(name)) continue;
+      if (/^(?:文件|File|分类|模板|用户|帮助)[:：]/i.test(name)) continue;
+      if (/^(?:单|双|普通|紧急|单座|二座)$/.test(name)) continue;
+      // Cells without links are still valid stage entries in some PRTS tables.
+      // Reject obvious explanatory/note cells, but otherwise preserve them.
+      if (!prtsUrls.length && (name.length > 50 || /^(?:注|说明|备注|※)/.test(name))) continue;
 
       for (const variant of variants) {
-        const categoryId = `${sectionCode}:${variant.id}`;
-        const key = `${theme}|${sectionCode}|${currentFloor}|${variant.id}|${name}`;
+        const categoryId = `${sectionCode}:${variant.id}:${sectionName}`;
+        const key = `${theme}|${sectionCode}|${sectionName}|${currentFloor}|${variant.id}|${name}`;
         if (seen.has(key)) continue;
         seen.add(key);
         output.push({
@@ -752,10 +788,11 @@ function stageRowsFromOrderedRows(theme, $, rows, sharedImageFloorMap = new Map(
           categoryId,
           categoryName: variant.name,
           variant: variant.id,
-          prtsUrl: normalizeStageHref(href),
+          prtsUrl: prtsUrls[0] ?? "",
+          prtsUrls,
         });
       }
-    });
+    }
   }
   return output;
 }
@@ -793,22 +830,15 @@ function stageSectionRoot($) {
 }
 
 function innermostStageTables($, root) {
-  // `root` may itself be a collection containing the stage table as a direct
-  // sibling of the “关卡一览” heading. Cheerio's `.find()` only searches
-  // descendants, so include root-level tables explicitly.
+  // Include both direct sibling tables and descendants. Do not discard a valid
+  // outer table merely because it contains another ISW table: newer themes can
+  // place additional section rows directly in the wrapper alongside nested
+  // tables. Stage IDs are deduplicated after parsing.
   const allTables = [
     ...root.filter("table").toArray(),
     ...root.find("table").toArray(),
   ];
-  const uniqueTables = [...new Set(allTables)];
-  const candidates = uniqueTables.filter((table) => isStageTable($, table));
-
-  // Keep tables that do not contain another valid stage table. This removes
-  // outer MediaWiki/collapsible wrapper tables while preserving the actual
-  // ISW tables. A single table may contain multiple ISW sections.
-  return candidates.filter((table) => {
-    return !$(table).find("table").toArray().some((child) => child !== table && isStageTable($, child));
-  });
+  return [...new Set(allTables)].filter((table) => isStageTable($, table));
 }
 
 const THEME_STAGE_ADAPTERS = {

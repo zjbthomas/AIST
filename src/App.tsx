@@ -206,6 +206,7 @@ function App() {
         categoryId: stage.categoryId ?? `LEGACY:${stage.battleType ?? "normal"}`,
         categoryName: stage.categoryName ?? ({ normal: "一般作战", emergency: "紧急作战", boss: "险路恶敌", special: "特殊作战" }[stage.battleType ?? "normal"] ?? "旧版作战"),
         variant: stage.variant ?? stage.battleType ?? "default",
+        prtsUrls: Array.isArray(stage.prtsUrls) ? stage.prtsUrls : (stage.prtsUrl ? [stage.prtsUrl] : []),
       })));
       if (Array.isArray(squadData) && squadData.length) setSquads(squadData);
       if (Array.isArray(nodeTypeData) && nodeTypeData.length) setNodeTypes(nodeTypeData);
@@ -512,7 +513,11 @@ function App() {
               ? <span className="battle-type-badge node-type-badge">{node.categoryName ?? node.name}</span>
               : null}
           <div className="node-actions">
-            {node.stageId && <a href={stages.find((stage) => stage.id === node.stageId)?.prtsUrl} target="_blank" rel="noreferrer"><ExternalLink size={14}/></a>}
+            {node.stageId && (() => {
+              const stage = stages.find((item) => item.id === node.stageId);
+              const links = stage?.prtsUrls?.length ? stage.prtsUrls : (stage?.prtsUrl ? [stage.prtsUrl] : []);
+              return links.map((href, linkIndex) => <a key={`${href}-${linkIndex}`} href={href} target="_blank" rel="noreferrer" title={`在 PRTS 查看${links.length > 1 ? `变体 ${linkIndex + 1}` : "关卡"}`} className="node-stage-link"><ExternalLink size={14}/>{links.length > 1 && <small>{linkIndex + 1}</small>}</a>);
+            })()}
             {node.type !== "initial" && !isPresetPreview && (
               <span className="node-edit-actions">
                 <button onClick={() => setEditingNodeId(node.id)} title="修改节点"><Pencil size={14}/></button>
@@ -573,7 +578,7 @@ function App() {
       <div className="stage-list">{stages
         .filter(s=>s.theme===run.theme&&(stageCategory==="all"||s.categoryId===stageCategory)&&(s.floor===0||s.floor===stageFloor))
         .sort((a,b)=>a.categoryName.localeCompare(b.categoryName,"zh-CN")||a.name.localeCompare(b.name,"zh-CN"))
-        .map(s=><button key={s.id} className="stage-item" onClick={()=>addStage(s.id)}><span>{s.floor?`第 ${s.floor} 层`:`第 ${stageFloor} 层（自选）`} · {s.categoryName}</span><strong>{s.name}</strong><small>{s.sectionCode} · {s.sectionName}</small></button>)}</div>
+        .map(s=><button key={s.id} className="stage-item" onClick={()=>addStage(s.id)}><span>{s.floor?`第 ${s.floor} 层`:`第 ${stageFloor} 层（自选）`} · {s.categoryName}</span><strong>{s.name}</strong><small>{s.sectionCode} · {s.sectionName}{(s.prtsUrls?.length ?? (s.prtsUrl ? 1 : 0)) > 1 ? ` · ${s.prtsUrls?.length} 个 PRTS 链接` : ""}</small></button>)}</div>
     </Modal>}
     {showNodePicker&&<Modal title="添加其它节点" onClose={()=>setShowNodePicker(false)}>
       <div className="editor-form">
