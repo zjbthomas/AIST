@@ -1,6 +1,6 @@
 export type Elite = 1 | 2;
 export type Skill = 1 | 2 | 3;
-export type NodeType = "initial" | "combat";
+export type NodeType = "initial" | "combat" | "event" | "shop" | "encounter" | "other";
 
 export type TimelineNode = {
   id: string;

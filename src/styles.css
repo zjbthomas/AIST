@@ -217,3 +217,13 @@ td { font-size: 14px; }
   font-size: 13px;
 }
 .stage-floor-warning span { opacity: .82; }
+.row-drag-handle { display:grid; place-items:center; color:#64748b; cursor:grab; flex:0 0 auto; }
+.operator-label:active .row-drag-handle { cursor:grabbing; }
+.operator-prts-link { width:30px; height:30px; display:grid; place-items:center; border-radius:8px; color:#93c5fd; background:rgba(59,130,246,.1); flex:0 0 auto; }
+.operator-prts-link:hover { background:rgba(59,130,246,.22); color:#dbeafe; }
+.timeline-cell[draggable="true"] { cursor:grab; }
+.timeline-cell[draggable="true"]:active { cursor:grabbing; }
+.node-type-badge { background:#164e63; color:#cffafe; border-color:#0e7490; }
+.node-kind-options { flex-wrap:wrap; }
+.node-kind-options button { flex:1 1 120px; }
+.editor-form label input { width:100%; min-height:42px; margin-top:8px; border:1px solid #334155; border-radius:10px; background:#0f172a; color:#f8fafc; padding:0 12px; }

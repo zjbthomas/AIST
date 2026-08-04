@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { pinyin } from "pinyin-pro";
-import { Copy, Download, ExternalLink, FolderOpen, Library, Plus, Trash2, Upload, X } from "lucide-react";
+import { Copy, Download, ExternalLink, FolderOpen, GripVertical, Library, Plus, Trash2, Upload, X } from "lucide-react";
 import { fallbackOperators, type Operator } from "./data/operators";
 import { squads as fallbackSquads, stages as fallbackStages, themes, type Stage } from "./data/stages";
 import type { CellState, Elite, RunOperator, RunState, Skill, TimelineNode, TrackerStore } from "./types";
@@ -56,6 +56,23 @@ type PresetSummary = {
 
 type LoadedPreset = PresetSummary & { run: RunState };
 
+type NodeTypeOption = {
+  id: string;
+  theme: string;
+  code?: string;
+  name: string;
+  kind: "combat" | "other";
+};
+
+const FALLBACK_OTHER_NODE_TYPES: Omit<NodeTypeOption, "theme">[] = [
+  { id: "encounter", code: "ENCOUNTER", name: "不期而遇", kind: "other" },
+  { id: "wish", code: "WISH", name: "得偿所愿", kind: "other" },
+  { id: "safe-house", code: "SAFE HOUSE", name: "安全屋", kind: "other" },
+  { id: "downtime-recreation", code: "DOWNTIME RECREATION", name: "幕间余兴", kind: "other" },
+  { id: "rogue-trader", code: "ROGUE TRADER", name: "诡意行商", kind: "other" },
+  { id: "enter-new-floor", code: "ENTER NEW FLOOR", name: "（进入新一层）", kind: "other" },
+];
+
 function cloneRun(source: RunState, suffix = " - 副本"): RunState {
   const cloned = structuredClone(source);
   const createdAt = now();
@@ -83,9 +100,14 @@ function App() {
   const [operators, setOperators] = useState<Operator[]>(fallbackOperators);
   const [stages, setStages] = useState<Stage[]>(fallbackStages);
   const [squads, setSquads] = useState<{ id: string; theme: string; name: string }[]>(themes.flatMap((theme) => fallbackSquads.map((name) => ({ id: `${theme}|${name}`, theme, name }))));
+  const [nodeTypes, setNodeTypes] = useState<NodeTypeOption[]>(themes.flatMap((theme) => FALLBACK_OTHER_NODE_TYPES.map((item) => ({ ...item, theme, id: `${theme}|${item.id}` }))));
   const [dataStatus, setDataStatus] = useState("正在检查 PRTS 数据…");
   const [showOperatorPicker, setShowOperatorPicker] = useState(false);
   const [showStagePicker, setShowStagePicker] = useState(false);
+  const [showNodePicker, setShowNodePicker] = useState(false);
+  const [customNodeFloor, setCustomNodeFloor] = useState(1);
+  const [customNodeTypeId, setCustomNodeTypeId] = useState("custom");
+  const [customNodeName, setCustomNodeName] = useState("不期而遇");
   const [stageCategory, setStageCategory] = useState<string>("all");
   const [stageFloor, setStageFloor] = useState<number>(1);
   const [showRunManager, setShowRunManager] = useState(false);
@@ -101,22 +123,39 @@ function App() {
   const [operatorPickerSort, setOperatorPickerSort] = useState<"rarity-desc" | "rarity-asc" | "name-asc">("rarity-desc");
   const [sortBy, setSortBy] = useState<"recruit" | "rarity" | "deploy">("recruit");
   const importRef = useRef<HTMLInputElement>(null);
+  const draggedOperatorId = useRef<string | null>(null);
 
   const localRun = store.runs.find((item) => item.id === store.activeRunId) ?? store.runs[0];
   const previewPreset = presets.find((item) => item.id === previewPresetId);
   const run = previewPreset?.run ?? localRun;
   const isPresetPreview = Boolean(previewPreset);
   const hasTimelineData = run.operators.length > 0 || run.nodes.some((node) => node.type !== "initial");
+  const currentOtherNodeTypes = useMemo(() => {
+    const synced = nodeTypes.filter((item) => item.theme === run.theme && item.kind === "other");
+    const fallback = FALLBACK_OTHER_NODE_TYPES.map((item) => ({ ...item, theme: run.theme, id: `${run.theme}|${item.id}` }));
+    // “进入新一层”不是 PRTS 节点，而是记录器提供的固定时间轴节点。
+    // 即使同步数据存在，也始终把它补进当前主题的其它节点列表。
+    const source = synced.length ? [...synced, ...fallback.filter((item) => item.id.endsWith("|enter-new-floor"))] : fallback;
+    return source.filter((item, index) => source.findIndex((candidate) => candidate.name === item.name) === index);
+  }, [nodeTypes, run.theme]);
 
   useEffect(() => localStorage.setItem(STORAGE_KEY, JSON.stringify(store)), [store]);
   useEffect(() => { setStageCategory("all"); setStageFloor(1); }, [run.theme]);
+  useEffect(() => {
+    const first = currentOtherNodeTypes[0];
+    if (first) {
+      setCustomNodeTypeId(first.id);
+      setCustomNodeName(first.name);
+    }
+  }, [run.theme, nodeTypes]);
   useEffect(() => {
     Promise.all([
       fetch(asset("data/operators.json"), { cache: "no-cache" }).then((r) => r.ok ? r.json() : Promise.reject()),
       fetch(asset("data/stages.json"), { cache: "no-cache" }).then((r) => r.ok ? r.json() : Promise.reject()),
       fetch(asset("data/squads.json"), { cache: "no-cache" }).then((r) => r.ok ? r.json() : []),
+      fetch(asset("data/node-types.json"), { cache: "no-cache" }).then((r) => r.ok ? r.json() : []),
       fetch(asset("data/manifest.json"), { cache: "no-cache" }).then((r) => r.ok ? r.json() : null),
-    ]).then(([opData, stageData, squadData, manifest]) => {
+    ]).then(([opData, stageData, squadData, nodeTypeData, manifest]) => {
       if (Array.isArray(opData) && opData.length) setOperators(opData.map((op: Operator) => ({ ...op, profession: normalizeProfession(op.profession) })));
       if (Array.isArray(stageData) && stageData.length) setStages(stageData.map((stage: Stage & { battleType?: string }) => ({
         ...stage,
@@ -127,6 +166,7 @@ function App() {
         variant: stage.variant ?? stage.battleType ?? "default",
       })));
       if (Array.isArray(squadData) && squadData.length) setSquads(squadData);
+      if (Array.isArray(nodeTypeData) && nodeTypeData.length) setNodeTypes(nodeTypeData);
       setDataStatus(manifest?.updatedAt ? `PRTS 数据：${new Date(manifest.updatedAt).toLocaleString("zh-CN")}` : "已加载本地 PRTS 数据");
     }).catch(() => setDataStatus("使用内置数据；下次启动会再次检查"));
   }, []);
@@ -206,7 +246,12 @@ function App() {
   }
   function addOperator(op: Operator) {
     if (run.operators.some((row) => row.operatorId === op.id)) return;
-    updateRun((current) => ({ ...current, operators: [...current.operators, { operatorId: op.id, cells: {} }] }));
+    updateRun((current) => {
+      const recruitNode = current.nodes.at(-1) ?? current.nodes[0];
+      const cells = recruitNode ? { [recruitNode.id]: { recruitType: "normal" as const, elite: 1 as const } } : {};
+      return { ...current, operators: [...current.operators, { operatorId: op.id, cells }] };
+    });
+    setShowOperatorPicker(false);
   }
   function addStage(stageId: string) {
     const stage = stages.find((item) => item.id === stageId); if (!stage) return;
@@ -223,23 +268,54 @@ function App() {
       for (let i = 1; i < next.length; i++) if (next[i].floor > floor) { insertAt = i; break; }
       next.splice(insertAt, 0, node);
 
-      // Carry the previous node's battle setup into the newly added stage.
-      // Only per-battle choices are inherited: deployment and skill. One-time
-      // events such as recruitment, temporary recruitment and promotion are not.
-      const previousNode = insertAt > 0 ? next[insertAt - 1] : undefined;
+      // Inherit the setup from the nearest earlier combat node, skipping any
+      // event/shop/encounter nodes between it and the newly added battle.
+      // Recruitment and promotion are one-time events and are never copied.
+      const previousCombatNode = [...next.slice(0, insertAt)]
+        .reverse()
+        .find((candidate) => candidate.type === "combat");
       const operators = current.operators.map((row) => {
-        if (!previousNode) return row;
-        const previous = row.cells[previousNode.id] ?? {};
+        if (!previousCombatNode) return row;
+        const previous = row.cells[previousCombatNode.id] ?? {};
         const inherited: CellState = previous.deployed
           ? { deployed: true, skill: previous.skill }
-          : { deployed: false };
-        return { ...row, cells: { ...row.cells, [node.id]: inherited } };
+          : {};
+        return Object.keys(inherited).length
+          ? { ...row, cells: { ...row.cells, [node.id]: inherited } }
+          : row;
       });
 
       return { ...current, nodes: next, operators };
     });
     setShowStagePicker(false);
   }
+
+  function addCustomNode() {
+    const selected = customNodeTypeId === "custom" ? undefined : currentOtherNodeTypes.find((item) => item.id === customNodeTypeId);
+    const defaultName = selected?.name ?? "其它节点";
+    const name = customNodeName.trim() || defaultName;
+    const normalizedName = name === "商店" ? "诡意行商" : name;
+    const timelineType: TimelineNode["type"] = /诡意行商/.test(normalizedName)
+      ? "shop"
+      : /不期而遇/.test(normalizedName)
+        ? "encounter"
+        : "event";
+    updateRun((current) => {
+      const node: TimelineNode = {
+        id: uid(), floor: customNodeFloor, type: timelineType, name: normalizedName,
+        categoryId: selected?.id, categoryName: selected?.name,
+        sectionCode: selected?.code, sectionName: "事件节点",
+      };
+      const next = [...current.nodes];
+      let insertAt = next.length;
+      for (let i = 1; i < next.length; i++) if (next[i].floor > customNodeFloor) { insertAt = i; break; }
+      next.splice(insertAt, 0, node);
+      // Non-combat nodes intentionally do not carry any operator state.
+      return { ...current, nodes: next };
+    });
+    setShowNodePicker(false);
+  }
+
   function removeNode(nodeId: string) {
     updateRun((current) => ({
       ...current, nodes: current.nodes.filter((node) => node.id !== nodeId || node.type === "initial"),
@@ -301,15 +377,15 @@ function App() {
       <label>集成战略<select disabled={isPresetPreview || hasTimelineData} title={hasTimelineData ? "已有干员或关卡时不能更改集成战略；请先一键清除" : undefined} value={run.theme} onChange={(e) => { const theme = e.target.value; const firstSquad = squads.find((item) => item.theme === theme)?.name ?? fallbackSquads[0]; updateRun((r) => ({ ...r, theme, squad: firstSquad })); }}>{themes.map((x) => <option key={x}>{x}</option>)}</select></label>
       <label>分队<select disabled={isPresetPreview} value={run.squad} onChange={(e) => updateRun((r) => ({ ...r, squad: e.target.value }))}>{availableSquads.map((x) => <option key={x.id} value={x.name}>{x.name}</option>)}</select></label>
       <label>行排序<select value={sortBy} onChange={(e) => setSortBy(e.target.value as typeof sortBy)}><option value="recruit">添加顺序</option><option value="rarity">星级降序</option><option value="deploy">出场次数</option></select></label>
-      <div className="toolbar-actions"><button disabled={isPresetPreview} onClick={() => setShowOperatorPicker(true)}><Plus size={16}/> 添加干员</button><button disabled={isPresetPreview} onClick={() => setShowStagePicker(true)}><Plus size={16}/> 添加关卡</button><button className="danger-button" disabled={isPresetPreview || !hasTimelineData} onClick={clearOperatorsAndStages}><Trash2 size={16}/> 一键清除干员和关卡</button></div>
+      <div className="toolbar-actions"><button disabled={isPresetPreview} onClick={() => setShowOperatorPicker(true)}><Plus size={16}/> 添加干员</button><button disabled={isPresetPreview} onClick={() => setShowStagePicker(true)}><Plus size={16}/> 添加关卡</button><button disabled={isPresetPreview} onClick={() => setShowNodePicker(true)}><Plus size={16}/> 添加其它节点</button><button className="danger-button" disabled={isPresetPreview || !hasTimelineData} onClick={clearOperatorsAndStages}><Trash2 size={16}/> 一键清除干员和关卡</button></div>
     </section>
 
     <section className="timeline-panel panel"><div className="timeline-scroll"><div className="timeline-grid" style={{gridTemplateColumns:`210px repeat(${run.nodes.length}, 122px)`}}>
       <div className="corner floor-header sticky-left">干员 / 楼层</div>
       {floorGroups.map((g,i)=><div key={`${g.floor}-${i}`} className="floor-header" style={{gridColumn:`span ${g.count}`}}>{g.floor===0?"初始":`第 ${g.floor} 层`}</div>)}
       <div className="corner node-header sticky-left">节点</div>
-      {run.nodes.map((node)=><div className="node-header" key={node.id}><div className="node-title">{node.name}</div>{node.type==="combat"&&<span className="battle-type-badge">{node.categoryName??stages.find(s=>s.id===node.stageId)?.categoryName??"作战"}</span>}<div className="node-actions">{node.stageId&&<a href={stages.find(s=>s.id===node.stageId)?.prtsUrl} target="_blank" rel="noreferrer"><ExternalLink size={14}/></a>}{node.type!=="initial"&&!isPresetPreview&&<button onClick={()=>removeNode(node.id)}><Trash2 size={14}/></button>}</div></div>)}
-      {sortedRows.map((row)=>{const op=operatorMap[row.operatorId]; return op?<TimelineRow key={row.operatorId} row={row} operator={op} nodes={run.nodes} onRemove={()=>updateRun(r=>({...r,operators:r.operators.filter(x=>x.operatorId!==row.operatorId)}))} onEdit={(nodeId)=>{if(!isPresetPreview)setEditingCell({operatorId:row.operatorId,nodeId});}} readOnly={isPresetPreview}/>:null;})}
+      {run.nodes.map((node)=><div className="node-header" key={node.id}><div className="node-title">{node.name}</div>{node.type==="combat"?<span className="battle-type-badge">{node.categoryName??stages.find(s=>s.id===node.stageId)?.categoryName??"作战"}</span>:node.type!=="initial"?<span className="battle-type-badge node-type-badge">{node.categoryName ?? node.name}</span>:null}<div className="node-actions">{node.stageId&&<a href={stages.find(s=>s.id===node.stageId)?.prtsUrl} target="_blank" rel="noreferrer"><ExternalLink size={14}/></a>}{node.type!=="initial"&&!isPresetPreview&&<button onClick={()=>removeNode(node.id)}><Trash2 size={14}/></button>}</div></div>)}
+      {sortedRows.map((row)=>{const op=operatorMap[row.operatorId]; return op?<TimelineRow key={row.operatorId} row={row} operator={op} nodes={run.nodes} onRemove={()=>updateRun(r=>({...r,operators:r.operators.filter(x=>x.operatorId!==row.operatorId)}))} onEdit={(nodeId)=>{if(!isPresetPreview)setEditingCell({operatorId:row.operatorId,nodeId});}} readOnly={isPresetPreview} onRowDragStart={()=>{draggedOperatorId.current=row.operatorId;}} onRowDrop={()=>{if(draggedOperatorId.current)moveOperatorRow(draggedOperatorId.current,row.operatorId);draggedOperatorId.current=null;}} onMoveCell={(sourceNodeId,targetNodeId)=>moveCellState(row.operatorId,sourceNodeId,targetNodeId)}/>:null;})}
     </div></div></section>
     <Stats run={run} operatorMap={operatorMap}/>
     <AggregateStats store={store} presets={presets} operatorMap={operatorMap}/>
@@ -346,14 +422,22 @@ function App() {
         .sort((a,b)=>a.categoryName.localeCompare(b.categoryName,"zh-CN")||a.name.localeCompare(b.name,"zh-CN"))
         .map(s=><button key={s.id} className="stage-item" onClick={()=>addStage(s.id)}><span>{s.floor?`第 ${s.floor} 层`:`第 ${stageFloor} 层（自选）`} · {s.categoryName}</span><strong>{s.name}</strong><small>{s.sectionCode} · {s.sectionName}</small></button>)}</div>
     </Modal>}
+    {showNodePicker&&<Modal title="添加其它节点" onClose={()=>setShowNodePicker(false)}>
+      <div className="editor-form">
+        <div><div className="field-title">节点类型</div><div className="segmented node-kind-options">{currentOtherNodeTypes.map((item)=><button key={item.id} className={customNodeTypeId===item.id?'active':''} onClick={()=>{setCustomNodeTypeId(item.id);setCustomNodeName(item.name);}}>{item.name}</button>)}<button className={customNodeTypeId==='custom'?'active':''} onClick={()=>{setCustomNodeTypeId('custom');setCustomNodeName('自定义节点');}}>自定义节点</button></div></div>
+        <label>节点名称<input value={customNodeName} onChange={(e)=>setCustomNodeName(e.target.value)} /></label>
+        <div><div className="field-title">所在楼层</div><div className="stage-floor-filters">{[1,2,3,4,5,6].map(floor=><button key={floor} className={customNodeFloor===floor?'active':''} onClick={()=>setCustomNodeFloor(floor)}>第 {floor} 层</button>)}</div></div>
+        <button className="wide-button" onClick={addCustomNode}><Plus size={16}/> 添加节点</button>
+      </div>
+    </Modal>}
     {editingCell&&<CellEditor operator={operatorMap[editingCell.operatorId]} node={run.nodes.find(n=>n.id===editingCell.nodeId)!} row={run.operators.find(r=>r.operatorId===editingCell.operatorId)!} nodes={run.nodes} onChange={(patch)=>updateCell(editingCell.operatorId,editingCell.nodeId,patch)} onClose={()=>setEditingCell(null)}/>} 
     {showPresetLibrary&&<PresetLibrary presets={presets} status={presetStatus} onClose={()=>setShowPresetLibrary(false)} onPreview={(id)=>{setPreviewPresetId(id);setShowPresetLibrary(false);}} onCopy={copyPreset}/>}
     {showRunManager&&<RunManager store={store} onClose={()=>setShowRunManager(false)} onSelect={(id)=>{setPreviewPresetId(null);setStore(s=>({...s,activeRunId:id}));}} onCreate={()=>{const newRun=createRun();setStore(s=>({...s,activeRunId:newRun.id,runs:[...s.runs,newRun]}));}} onDelete={(id)=>setStore(s=>{if(s.runs.length===1)return s;const runs=s.runs.filter(r=>r.id!==id);return{...s,runs,activeRunId:s.activeRunId===id?runs[0].id:s.activeRunId};})}/>} 
   </div>;
 }
 
-function TimelineRow({row,operator,nodes,onRemove,onEdit,readOnly=false}:{row:RunOperator;operator:Operator;nodes:TimelineNode[];onRemove:()=>void;onEdit:(id:string)=>void;readOnly?:boolean}) {
-  return <><div className="operator-label sticky-left"><OperatorAvatar operator={operator} size={50}/><div className="operator-text"><a href={operator.prtsUrl} target="_blank" rel="noreferrer">{operator.name}</a><span>{operator.rarity}★ · 出场 {countDeploys(row)}</span></div>{!readOnly&&<button onClick={onRemove}><X size={15}/></button>}</div>{nodes.map((node,index)=>{const state=row.cells[node.id]??{};const recruitedIndex=nodes.findIndex(n=>Boolean(row.cells[n.id]?.recruitType));const owned=recruitedIndex>=0&&index>=recruitedIndex;const effective=resolveEffectiveState(row,nodes,index);return <button key={node.id} className={`timeline-cell ${owned?"owned":""} ${readOnly?"readonly":""}`} onClick={()=>onEdit(node.id)}>{owned&&<span className="connector"/>}{(state.recruitType||state.deployed)&&<OperatorAvatar operator={operator} state={{...state,elite:effective.elite,recruitType:effective.recruitType}} recruitedHere={Boolean(state.recruitType)} size={68}/>} {state.promotionAfter===2&&<span className="promotion-after" title="本关结束后晋升精英化二"><span>→</span><img src={asset("icons/elite-2.svg")} alt="关卡后晋升精英化二"/></span>}</button>;})}</>;
+function TimelineRow({row,operator,nodes,onRemove,onEdit,readOnly=false,onRowDragStart,onRowDrop,onMoveCell}:{row:RunOperator;operator:Operator;nodes:TimelineNode[];onRemove:()=>void;onEdit:(id:string)=>void;readOnly?:boolean;onRowDragStart:()=>void;onRowDrop:()=>void;onMoveCell:(sourceNodeId:string,targetNodeId:string)=>void}) {
+  return <><div className="operator-label sticky-left" onDragOver={(event)=>{if(event.dataTransfer.types.includes("application/x-aist-row"))event.preventDefault();}} onDrop={(event)=>{if(event.dataTransfer.types.includes("application/x-aist-row")){event.preventDefault();onRowDrop();}}}><span className="row-drag-handle" draggable={!readOnly} onDragStart={(event)=>{event.stopPropagation();event.dataTransfer.effectAllowed="move";event.dataTransfer.setData("application/x-aist-row",operator.id);event.dataTransfer.setData("text/plain",`row:${operator.id}`);onRowDragStart();}} title="拖动调整干员行顺序"><GripVertical size={18}/></span><OperatorAvatar operator={operator} size={50}/><div className="operator-text"><span>{operator.name}</span><span>{operator.rarity}★ · 出场 {countDeploys(row)}</span></div><a className="operator-prts-link" href={operator.prtsUrl} target="_blank" rel="noreferrer" title="在 PRTS 查看干员"><ExternalLink size={15}/></a>{!readOnly&&<button onClick={onRemove}><X size={15}/></button>}</div>{nodes.map((node,index)=>{const state=row.cells[node.id]??{};const hasState=Object.keys(state).length>0;const recruitedIndex=nodes.findIndex(n=>Boolean(row.cells[n.id]?.recruitType));const owned=recruitedIndex>=0&&index>=recruitedIndex;const effective=resolveEffectiveState(row,nodes,index);return <button key={node.id} className={`timeline-cell ${owned?"owned":""} ${readOnly?"readonly":""}`} draggable={!readOnly&&hasState} onDragStart={(event)=>{if(!hasState)return;event.stopPropagation();event.dataTransfer.effectAllowed="move";event.dataTransfer.setData("application/x-aist-cell",JSON.stringify({operatorId:operator.id,nodeId:node.id}));event.dataTransfer.setData("text/plain",JSON.stringify({operatorId:operator.id,nodeId:node.id}));}} onDragOver={(event)=>{if(!readOnly&&!hasState&&event.dataTransfer.types.includes("application/x-aist-cell")){event.preventDefault();event.dataTransfer.dropEffect="move";}}} onDrop={(event)=>{if(readOnly||hasState)return;const raw=event.dataTransfer.getData("application/x-aist-cell")||event.dataTransfer.getData("text/plain");if(!raw||raw.startsWith("row:"))return;event.preventDefault();event.stopPropagation();try{const payload=JSON.parse(raw);if(payload.operatorId===operator.id)onMoveCell(payload.nodeId,node.id);}catch{}}} onClick={()=>onEdit(node.id)}>{owned&&<span className="connector"/>}{(state.recruitType||state.deployed)&&<OperatorAvatar operator={operator} state={{...state,elite:effective.elite,recruitType:effective.recruitType}} recruitedHere={Boolean(state.recruitType)} size={68}/>} {state.promotionAfter===2&&<span className="promotion-after" title="此节点后晋升精英化二"><span>→</span><img src={asset("icons/elite-2.svg")} alt="节点后晋升精英化二"/></span>}</button>;})}</>;
 }
 
 function OperatorAvatar({operator,state,size=58,recruitedHere=false}:{operator:Operator;state?:CellState;size?:number;recruitedHere?:boolean}) {
@@ -369,14 +453,15 @@ function CellEditor({operator,node,row,nodes,onChange,onClose}:{operator:Operato
   const effective=resolveEffectiveState(row,nodes,index);
   const availableSkills=[...operator.skills].sort((a,b)=>a.index-b.index);
   const firstSkill=availableSkills[0]?.index;
-  const canPromoteAfter=node.type==="combat"&&Boolean(effective.recruitType)&&effective.elite===1;
+  const isCombatNode=node.type==="combat";
+  const canPromoteAfter=Boolean(effective.recruitType)&&effective.elite===1;
   return <Modal title={`${operator.name} · ${node.name}`} onClose={onClose}><div className="editor-form">
     <div><div className="field-title">招募方式（只能选择一次）</div><div className="segmented"><button disabled={alreadyRecruited} className={state.recruitType==="normal"?"active":""} onClick={()=>state.recruitType==="normal"?onChange({recruitType:undefined,elite:undefined,deployed:undefined,skill:undefined,promotionAfter:undefined}):onChange({recruitType:"normal",elite:state.elite??1})}>普通招募</button><button disabled={alreadyRecruited} className={state.recruitType==="temporary"?"active":""} onClick={()=>state.recruitType==="temporary"?onChange({recruitType:undefined,elite:undefined,deployed:undefined,skill:undefined,promotionAfter:undefined}):onChange({recruitType:"temporary",elite:state.elite??1})}>临时招募</button></div>{alreadyRecruited&&<p className="hint">该干员已经在更早的节点招募，不能再次招募。</p>}</div>
     {state.recruitType&&<div><div className="field-title">招募时精英化状态</div><div className="segmented image-options"><button className={(state.elite??1)===1?"active":""} onClick={()=>onChange({elite:1})}><img src={asset("icons/elite-1.svg")}/><span>精英化一</span></button><button className={state.elite===2?"active":""} onClick={()=>onChange({elite:2,promotionAfter:undefined})}><img src={asset("icons/elite-2.svg")}/><span>直接精英化二</span></button></div><p className="hint">招募时可以直接获得精英化一或精英化二，不要求先精一再晋升。</p></div>}
-    <label className="check-row"><input type="checkbox" checked={Boolean(state.deployed)} disabled={!effective.recruitType} onChange={(e)=>onChange({deployed:e.target.checked,skill:e.target.checked?(state.skill??firstSkill):undefined})}/> 本关出场</label>
-    <div><div className="field-title">本关使用时的精英化状态</div><div className="current-elite"><img src={asset(`icons/elite-${effective.elite??1}.svg`)}/><span>精英化 {effective.elite??1}</span></div><p className="hint">招募时可直接选择精一或精二；若之后晋升，则从下一节点开始生效。</p></div>
-    <div><div className="field-title">关卡结束后</div><button className={`promotion-button ${state.promotionAfter===2?"active":""}`} disabled={!canPromoteAfter&&state.promotionAfter!==2} onClick={()=>onChange({promotionAfter:state.promotionAfter===2?undefined:2})}><img src={asset("icons/elite-2.svg")}/><span>{state.promotionAfter===2?"已标记：本关后晋升精英化二":"本关后晋升精英化二"}</span></button>{effective.elite===2&&<p className="hint">该干员在本关开始前已经是精英化二。</p>}</div>
-    <div><div className="field-title">本关使用技能</div>{availableSkills.length?<div className="segmented image-options">{availableSkills.map(info=><button key={info.index} disabled={!effective.recruitType} className={state.deployed&&state.skill===info.index?"active":""} onClick={()=>onChange({skill:info.index,deployed:true})}><img src={info.icon||asset("icons/skill-fallback.svg")}/><span>{info.name||`技能 ${info.index}`}</span></button>)}</div>:<p className="hint">PRTS 数据显示该干员没有可选择的技能。</p>}</div>
+    {isCombatNode&&<label className="check-row"><input type="checkbox" checked={Boolean(state.deployed)} disabled={!effective.recruitType} onChange={(e)=>onChange({deployed:e.target.checked,skill:e.target.checked?(state.skill??firstSkill):undefined})}/> 本关出场</label>}
+    <div><div className="field-title">当前精英化状态</div><div className="current-elite"><img src={asset(`icons/elite-${effective.elite??1}.svg`)}/><span>精英化 {effective.elite??1}</span></div><p className="hint">招募时可直接选择精一或精二；在任意节点标记晋升后，从下一个节点开始按精二记录。</p></div>
+    <div><div className="field-title">{isCombatNode?"关卡结束后":"此节点之后"}</div><button className={`promotion-button ${state.promotionAfter===2?"active":""}`} disabled={!canPromoteAfter&&state.promotionAfter!==2} onClick={()=>onChange({promotionAfter:state.promotionAfter===2?undefined:2})}><img src={asset("icons/elite-2.svg")}/><span>{state.promotionAfter===2?`已标记：${isCombatNode?"本关后":"此节点后"}晋升精英化二`:`${isCombatNode?"本关后":"此节点后"}晋升精英化二`}</span></button>{effective.elite===2&&<p className="hint">该干员在此节点开始前已经是精英化二。</p>}</div>
+    {isCombatNode&&<div><div className="field-title">本关使用技能</div>{availableSkills.length?<div className="segmented image-options">{availableSkills.map(info=><button key={info.index} disabled={!effective.recruitType} className={state.deployed&&state.skill===info.index?"active":""} onClick={()=>onChange({skill:info.index,deployed:true})}><img src={info.icon||asset("icons/skill-fallback.svg")}/><span>{info.name||`技能 ${info.index}`}</span></button>)}</div>:<p className="hint">PRTS 数据显示该干员没有可选择的技能。</p>}</div>}
   </div></Modal>;
 }
 

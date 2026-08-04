@@ -935,6 +935,94 @@ function extractSquadsFromHtml(theme, html) {
   return result;
 }
 
+
+const BASIC_OTHER_NODE_TYPES = [
+  { code: "ENCOUNTER", name: "不期而遇" },
+  { code: "WISH", name: "得偿所愿" },
+  { code: "SAFE HOUSE", name: "安全屋" },
+  { code: "DOWNTIME RECREATION", name: "幕间余兴" },
+  { code: "ROGUE TRADER", name: "诡意行商" },
+];
+
+function normalizeNodeTypeName(name) {
+  const text = compactText(name).replace(/^商店$/, "诡意行商");
+  return text;
+}
+
+function nodeTypeSectionRoot($) {
+  const headline = $("#事件节点").first();
+  if (!headline.length) return $.root();
+  const heading = headline.closest("h2,h3");
+  if (!heading.length) return $.root();
+  const nodes = [];
+  let node = heading.next();
+  while (node.length) {
+    if (node.is("h2")) break;
+    nodes.push(node.get(0));
+    node = node.next();
+  }
+  return nodes.length ? $(nodes) : $.root();
+}
+
+function extractNodeTypesFromHtml(theme, html) {
+  const $ = cheerio.load(html);
+  const root = nodeTypeSectionRoot($);
+  const result = [];
+  const seen = new Set();
+  const add = (code, rawName) => {
+    const name = normalizeNodeTypeName(rawName);
+    if (!name || seen.has(name)) return;
+    seen.add(name);
+    const combat = /^(作战|紧急作战|险路恶敌)$/.test(name);
+    result.push({ id: `${theme}|${safeName(code || name)}`, theme, code: compactText(code), name, kind: combat ? "combat" : "other" });
+  };
+
+  root.find("li").each((_, li) => {
+    const element = $(li);
+    const headingText = compactText(element.children("b,strong").first().text());
+    let label = headingText;
+    if (!label) {
+      const clone = element.clone();
+      clone.children("p,ul,ol,dl,table,div").remove();
+      label = compactText(textWithBreaks($, clone.get(0)));
+    }
+    const match = label.match(/^([A-Z][A-Z .&'/-]{1,45})[　\s]+(.{1,20})$/);
+    if (match) add(match[1], match[2]);
+  });
+
+  // PRTS occasionally changes wrappers; scan short bold labels as a fallback.
+  if (result.length < 5) {
+    root.find("b,strong").each((_, node) => {
+      const label = compactText($(node).text());
+      const match = label.match(/^([A-Z][A-Z .&'/-]{1,45})[　\s]+(.{1,20})$/);
+      if (match) add(match[1], match[2]);
+    });
+  }
+  return result;
+}
+
+async function syncNodeTypes() {
+  const all = [];
+  const byTheme = {};
+  for (const theme of ROGUELIKE_THEMES) {
+    const parsed = await request({ action: "parse", page: theme, prop: "text|revid" });
+    const html = typeof parsed.parse.text === "string" ? parsed.parse.text : parsed.parse.text["*"];
+    let types = extractNodeTypesFromHtml(theme, html);
+    if (types.filter((item) => item.kind === "other").length < 3) {
+      const existingNames = new Set(types.map((item) => item.name));
+      for (const item of BASIC_OTHER_NODE_TYPES) {
+        if (!existingNames.has(item.name)) types.push({ id: `${theme}|${safeName(item.code)}`, theme, ...item, kind: "other" });
+      }
+      console.warn(`Node types: ${theme} 的 PRTS 节点类型解析不完整，已补充基础节点。`);
+    }
+    all.push(...types);
+    byTheme[theme] = types.length;
+    console.log(`Node types: ${theme} -> ${types.filter((item) => item.kind === "other").map((item) => item.name).join("、")}`);
+  }
+  await fs.writeFile(path.join(OUT, "node-types.json"), JSON.stringify(all, null, 2));
+  return { count: all.length, byTheme };
+}
+
 async function syncSquads() {
   const all = [];
   const byTheme = {};
@@ -979,9 +1067,10 @@ try {
   try { previous = JSON.parse(await fs.readFile(manifestPath, "utf8")); } catch { /* no manifest */ }
   const operatorMeta = STAGES_ONLY ? previous.operatorMeta : await syncOperators();
   const stageMeta = OPERATORS_ONLY ? previous.stageMeta : await syncStages();
+  const nodeTypeMeta = OPERATORS_ONLY ? previous.nodeTypeMeta : await syncNodeTypes();
   const squadMeta = OPERATORS_ONLY ? previous.squadMeta : await syncSquads();
-  await fs.writeFile(manifestPath, JSON.stringify({ updatedAt: new Date().toISOString(), source: activeApi, operatorMeta, stageMeta, squadMeta }, null, 2));
-  console.log(`PRTS sync complete: ${operatorMeta?.count ?? "cached"} operators, ${stageMeta?.count ?? "cached"} stages, ${squadMeta?.count ?? "cached"} squads.`);
+  await fs.writeFile(manifestPath, JSON.stringify({ updatedAt: new Date().toISOString(), source: activeApi, operatorMeta, stageMeta, nodeTypeMeta, squadMeta }, null, 2));
+  console.log(`PRTS sync complete: ${operatorMeta?.count ?? "cached"} operators, ${stageMeta?.count ?? "cached"} stages, ${nodeTypeMeta?.count ?? "cached"} node types, ${squadMeta?.count ?? "cached"} squads.`);
 } catch (error) {
   console.error(`PRTS sync failed:
 ${error.stack ?? error.message}`);
