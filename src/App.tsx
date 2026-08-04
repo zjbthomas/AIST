@@ -366,6 +366,28 @@ function App() {
       operators: current.operators.map((row) => { const cells = { ...row.cells }; delete cells[nodeId]; return { ...row, cells }; }),
     }));
   }
+  function clearCombatColumn(nodeId: string) {
+    const node = run.nodes.find((item) => item.id === nodeId);
+    if (!node || node.type !== "combat") return;
+    const formationCount = run.operators.filter((row) => row.cells[nodeId]?.deployed).length;
+    if (formationCount === 0) return;
+    if (!window.confirm(`确定清除“${node.name}”这一列的全部编队与部署状态吗？\n招募、形态、精英化和晋升记录会保留。`)) return;
+    updateRun((current) => ({
+      ...current,
+      operators: current.operators.map((row) => {
+        const previous = row.cells[nodeId];
+        if (!previous?.deployed && !previous?.used && previous?.skill == null) return row;
+        const nextState: CellState = { ...previous };
+        delete nextState.deployed;
+        delete nextState.used;
+        delete nextState.skill;
+        const cells = { ...row.cells };
+        if (Object.keys(nextState).length > 0) cells[nodeId] = nextState;
+        else delete cells[nodeId];
+        return { ...row, cells };
+      }),
+    }));
+  }
   function updateCell(operatorId: string, nodeId: string, patch: Partial<CellState>) {
     updateRun((current) => ({ ...current, operators: current.operators.map((row) => {
       if (row.operatorId !== operatorId) return row;
@@ -479,7 +501,10 @@ function App() {
       <div className="corner floor-header sticky-left">干员 / 楼层</div>
       {floorGroups.map((g,i)=><div key={`${g.floor}-${i}`} className="floor-header" style={{gridColumn:`span ${g.count}`}}>{g.floor===0?"初始":`第 ${g.floor} 层`}</div>)}
       <div className="corner node-header sticky-left">节点</div>
-      {run.nodes.map((node) => (
+      {run.nodes.map((node) => {
+        const formationCount = node.type === "combat" ? run.operators.filter((row) => row.cells[node.id]?.deployed).length : 0;
+        const deploymentCount = node.type === "combat" ? run.operators.filter((row) => row.cells[node.id]?.used).length : 0;
+        return (
         <div
           className={`node-header ${node.type !== "initial" && !isPresetPreview ? "node-draggable" : ""}`}
           key={node.id}
@@ -509,7 +534,7 @@ function App() {
         >
           <div className="node-title">{node.name}</div>
           {node.type === "combat"
-            ? <span className="battle-type-badge">{node.categoryName ?? stages.find((stage) => stage.id === node.stageId)?.categoryName ?? "作战"}</span>
+            ? <><span className="battle-type-badge">{node.categoryName ?? stages.find((stage) => stage.id === node.stageId)?.categoryName ?? "作战"}</span><span className="node-column-counts" title="本列人数"><span>编队 {formationCount}</span><span>部署 {deploymentCount}</span></span></>
             : node.type !== "initial"
               ? <span className="battle-type-badge node-type-badge">{node.categoryName ?? node.name}</span>
               : null}
@@ -529,6 +554,9 @@ function App() {
                         : [];
               return links.map((href, linkIndex) => <a key={`${href}-${linkIndex}`} href={href} target="_blank" rel="noreferrer" title={`在 PRTS 查看${links.length > 1 ? `变体 ${linkIndex + 1}` : "关卡"}`} className="node-stage-link"><ExternalLink size={14}/>{links.length > 1 && <small>{linkIndex + 1}</small>}</a>);
             })()}
+            {node.type === "combat" && !isPresetPreview && (
+              <button className="clear-column-button" disabled={formationCount === 0} onClick={() => clearCombatColumn(node.id)} title="清除本列全部编队、部署和技能状态"><X size={14}/></button>
+            )}
             {node.type !== "initial" && !isPresetPreview && (
               <span className="node-edit-actions">
                 <button onClick={() => setEditingNodeId(node.id)} title="修改节点"><Pencil size={14}/></button>
@@ -537,7 +565,8 @@ function App() {
             )}
           </div>
         </div>
-      ))}
+        );
+      })}
       {simplifiedTimeline ? <>
         <div className="operator-label sticky-left simplified-row-label"><strong>本节点招募</strong><span>按节点纵向显示</span></div>
         {run.nodes.map((node,nodeIndex)=>{

@@ -1,0 +1,2516 @@
+{
+  "schemaVersion": 2,
+  "activeRunId": "3dca413b-4ac4-47dd-ad80-017ca75a5178",
+  "runs": [
+    {
+      "id": "3dca413b-4ac4-47dd-ad80-017ca75a5178",
+      "name": "仙术杯#8-Day5-萧然Q",
+      "theme": "岁的界园志异",
+      "squad": "突击战术分队",
+      "createdAt": "2026-08-03T21:08:39.616Z",
+      "updatedAt": "2026-08-04T05:29:09.347Z",
+      "nodes": [
+        {
+          "id": "71e78a93-6612-4cd7-b6c8-839b8f5990ad",
+          "floor": 0,
+          "type": "initial",
+          "name": "初始招募 / 分队"
+        },
+        {
+          "id": "848d48ea-c782-4cf5-ae40-a86dd801a8c8",
+          "floor": 1,
+          "type": "combat",
+          "stageId": "岁的界园志异|1|老戏骨",
+          "name": "老戏骨"
+        },
+        {
+          "id": "766dcc68-520c-4a21-994a-4c1aa38c686c",
+          "floor": 1,
+          "type": "combat",
+          "stageId": "岁的界园志异|ISW-NO|1|emergency|赶集",
+          "categoryId": "ISW-NO:emergency",
+          "categoryName": "紧急作战",
+          "sectionCode": "ISW-NO",
+          "sectionName": "一般作战 & 紧急作战",
+          "name": "赶集"
+        },
+        {
+          "id": "d46579a8-0e45-45f8-8d52-b4726da82628",
+          "floor": 2,
+          "type": "event",
+          "name": "指点迷津",
+          "sectionName": "事件节点"
+        },
+        {
+          "id": "eaf9c721-33fd-43ed-becc-6b4aa1a4d3a7",
+          "floor": 2,
+          "type": "combat",
+          "stageId": "岁的界园志异|ISW-NO|2|emergency|有教无类",
+          "categoryId": "ISW-NO:emergency",
+          "categoryName": "紧急作战",
+          "sectionCode": "ISW-NO",
+          "sectionName": "一般作战 & 紧急作战",
+          "name": "有教无类"
+        },
+        {
+          "id": "8f6820de-2c98-4361-9c8b-bfb92e939efe",
+          "floor": 2,
+          "type": "combat",
+          "stageId": "岁的界园志异|ISW-NO|2|normal|玩具兵将",
+          "categoryId": "ISW-NO:normal",
+          "categoryName": "一般作战",
+          "sectionCode": "ISW-NO",
+          "sectionName": "一般作战 & 紧急作战",
+          "name": "玩具兵将"
+        },
+        {
+          "id": "50ffa5a7-c7dc-4403-bb21-ad4c575ab1a9",
+          "floor": 2,
+          "type": "event",
+          "name": "（进入新一层）",
+          "categoryId": "岁的界园志异|enter-new-floor",
+          "categoryName": "（进入新一层）",
+          "sectionCode": "ENTER NEW FLOOR",
+          "sectionName": "事件节点"
+        },
+        {
+          "id": "8fbc8beb-2af1-4996-b0cc-a3cb91541649",
+          "floor": 2,
+          "type": "combat",
+          "stageId": "岁的界园志异|ISW-NO|0|default|贪妄",
+          "categoryId": "ISW-NO:default",
+          "categoryName": "祸乱",
+          "sectionCode": "ISW-NO",
+          "sectionName": "祸乱",
+          "name": "贪妄"
+        },
+        {
+          "id": "2f040533-ca02-4cf0-8c9b-17bfb7a11cb9",
+          "floor": 2,
+          "type": "combat",
+          "stageId": "岁的界园志异|ISW-NO|0|default|奇谭",
+          "categoryId": "ISW-NO:default",
+          "categoryName": "祸乱",
+          "sectionCode": "ISW-NO",
+          "sectionName": "祸乱",
+          "name": "奇谭"
+        },
+        {
+          "id": "bb93ebba-afb3-4369-877e-0a5d012b9fac",
+          "floor": 2,
+          "type": "combat",
+          "stageId": "岁的界园志异|ISW-NO|0|default|时封",
+          "categoryId": "ISW-NO:default",
+          "categoryName": "祸乱",
+          "sectionCode": "ISW-NO",
+          "sectionName": "祸乱",
+          "name": "时封"
+        },
+        {
+          "id": "e1bbf47a-8cbc-4e50-951b-471e2a685762",
+          "floor": 3,
+          "type": "combat",
+          "stageId": "岁的界园志异|ISW-NO|明烛试炼|0|default|赴陨 单座 / 二座",
+          "prtsUrl": "https://prts.wiki/w/ISW-NO_%E8%B5%B4%E9%99%A8(%E5%85%B6%E4%BA%8C)",
+          "prtsUrls": [
+            "https://prts.wiki/w/ISW-NO_%E8%B5%B4%E9%99%A8(%E5%85%B6%E4%BA%8C)",
+            "https://prts.wiki/w/ISW-NO_%E8%B5%B4%E9%99%A8"
+          ],
+          "categoryId": "ISW-NO:default:明烛试炼",
+          "categoryName": "明烛试炼",
+          "sectionCode": "ISW-NO",
+          "sectionName": "明烛试炼",
+          "name": "赴陨 单座 / 二座"
+        },
+        {
+          "id": "bfc8ce99-2428-4e1d-9881-03a462426851",
+          "floor": 3,
+          "type": "combat",
+          "stageId": "岁的界园志异|ISW-NO|一般作战 & 紧急作战|3|emergency|去晦",
+          "categoryId": "ISW-NO:emergency:一般作战 & 紧急作战",
+          "categoryName": "紧急作战",
+          "sectionCode": "ISW-NO",
+          "sectionName": "一般作战 & 紧急作战",
+          "prtsUrl": "https://prts.wiki/w/ISW-NO_%E5%8E%BB%E6%99%A6",
+          "prtsUrls": [
+            "https://prts.wiki/w/ISW-NO_%E5%8E%BB%E6%99%A6"
+          ],
+          "name": "去晦"
+        },
+        {
+          "id": "84229086-0d75-412f-babd-8b9d23197bf6",
+          "floor": 3,
+          "type": "combat",
+          "stageId": "岁的界园志异|ISW-NO|一般作战 & 紧急作战|3|normal|御外侮",
+          "categoryId": "ISW-NO:normal:一般作战 & 紧急作战",
+          "categoryName": "一般作战",
+          "sectionCode": "ISW-NO",
+          "sectionName": "一般作战 & 紧急作战",
+          "prtsUrl": "https://prts.wiki/w/ISW-NO_%E5%BE%A1%E5%A4%96%E4%BE%AE",
+          "prtsUrls": [
+            "https://prts.wiki/w/ISW-NO_%E5%BE%A1%E5%A4%96%E4%BE%AE"
+          ],
+          "name": "御外侮"
+        },
+        {
+          "id": "31ea9017-73d6-4b1d-94a2-b2272e65c0eb",
+          "floor": 3,
+          "type": "combat",
+          "stageId": "岁的界园志异|ISW-NO & ISW-DF|险路恶敌|3|default|剑·刀·矛",
+          "categoryId": "ISW-NO & ISW-DF:default:险路恶敌",
+          "categoryName": "险路恶敌",
+          "sectionCode": "ISW-NO & ISW-DF",
+          "sectionName": "险路恶敌",
+          "prtsUrl": "https://prts.wiki/w/ISW-NO_%E5%89%91%C2%B7%E5%88%80%C2%B7%E7%9F%9B",
+          "prtsUrls": [
+            "https://prts.wiki/w/ISW-NO_%E5%89%91%C2%B7%E5%88%80%C2%B7%E7%9F%9B"
+          ],
+          "name": "剑·刀·矛"
+        },
+        {
+          "id": "09f6bb9c-4fdb-4d5e-ba66-90fbc3e4d2bf",
+          "floor": 4,
+          "type": "combat",
+          "stageId": "岁的界园志异|ISW-SP|特殊挑战|0|default|生百相",
+          "categoryId": "ISW-SP:default:特殊挑战",
+          "categoryName": "特殊挑战",
+          "sectionCode": "ISW-SP",
+          "sectionName": "特殊挑战",
+          "prtsUrl": "https://prts.wiki/w/ISW-SP_%E7%94%9F%E7%99%BE%E7%9B%B8",
+          "prtsUrls": [
+            "https://prts.wiki/w/ISW-SP_%E7%94%9F%E7%99%BE%E7%9B%B8"
+          ],
+          "name": "生百相"
+        },
+        {
+          "id": "4f03f18d-b8b4-4e51-9c84-53bd2aba97d6",
+          "floor": 4,
+          "type": "shop",
+          "name": "诡意行商",
+          "categoryId": "岁的界园志异|ROGUE TRADER",
+          "categoryName": "诡意行商",
+          "sectionCode": "ROGUE TRADER",
+          "sectionName": "事件节点"
+        },
+        {
+          "id": "42e6b0c1-df64-450d-b3f2-51ca6bf3774e",
+          "floor": 4,
+          "type": "combat",
+          "stageId": "岁的界园志异|ISW-NO|明烛试炼|0|default|迎雷 单座 / 二座",
+          "categoryId": "ISW-NO:default:明烛试炼",
+          "categoryName": "明烛试炼",
+          "sectionCode": "ISW-NO",
+          "sectionName": "明烛试炼",
+          "prtsUrl": "https://prts.wiki/w/ISW-NO_%E8%BF%8E%E9%9B%B7(%E5%85%B6%E4%BA%8C)",
+          "prtsUrls": [
+            "https://prts.wiki/w/ISW-NO_%E8%BF%8E%E9%9B%B7(%E5%85%B6%E4%BA%8C)",
+            "https://prts.wiki/w/ISW-NO_%E8%BF%8E%E9%9B%B7"
+          ],
+          "name": "迎雷 单座 / 二座"
+        },
+        {
+          "id": "8923aff8-a2d7-45c3-8da9-f86fb7de3121",
+          "floor": 4,
+          "type": "combat",
+          "stageId": "岁的界园志异|ISW-NO|一般作战 & 紧急作战|4|emergency|识文",
+          "categoryId": "ISW-NO:emergency:一般作战 & 紧急作战",
+          "categoryName": "紧急作战",
+          "sectionCode": "ISW-NO",
+          "sectionName": "一般作战 & 紧急作战",
+          "prtsUrl": "https://prts.wiki/w/ISW-NO_%E8%AF%86%E6%96%87",
+          "prtsUrls": [
+            "https://prts.wiki/w/ISW-NO_%E8%AF%86%E6%96%87"
+          ],
+          "name": "识文"
+        },
+        {
+          "id": "63c09f0b-8a93-4098-b950-689d5f6dba5b",
+          "floor": 4,
+          "type": "combat",
+          "stageId": "岁的界园志异|ISW-NO|狭路相逢|0|default|南武约",
+          "categoryId": "ISW-NO:default:狭路相逢",
+          "categoryName": "狭路相逢",
+          "sectionCode": "ISW-NO",
+          "sectionName": "狭路相逢",
+          "prtsUrl": "https://prts.wiki/w/ISW-NO_%E5%8D%97%E6%AD%A6%E7%BA%A6",
+          "prtsUrls": [
+            "https://prts.wiki/w/ISW-NO_%E5%8D%97%E6%AD%A6%E7%BA%A6"
+          ],
+          "name": "南武约"
+        },
+        {
+          "id": "bd3642d1-4261-4215-aca0-ca1000aeb32d",
+          "floor": 4,
+          "type": "combat",
+          "stageId": "岁的界园志异|ISW-SP|特殊挑战|0|default|录忆",
+          "categoryId": "ISW-SP:default:特殊挑战",
+          "categoryName": "特殊挑战",
+          "sectionCode": "ISW-SP",
+          "sectionName": "特殊挑战",
+          "prtsUrl": "https://prts.wiki/w/ISW-DF_%E5%BD%95%E5%BF%86",
+          "prtsUrls": [
+            "https://prts.wiki/w/ISW-DF_%E5%BD%95%E5%BF%86"
+          ],
+          "name": "录忆"
+        },
+        {
+          "id": "68f3b5cc-cffa-437b-9f1a-98fd5a8409dd",
+          "floor": 5,
+          "type": "combat",
+          "stageId": "岁的界园志异|ISW-SP|特殊挑战|0|default|以逸待劳",
+          "categoryId": "ISW-SP:default:特殊挑战",
+          "categoryName": "特殊挑战",
+          "sectionCode": "ISW-SP",
+          "sectionName": "特殊挑战",
+          "prtsUrl": "https://prts.wiki/w/ISW-SP_%E4%BB%A5%E9%80%B8%E5%BE%85%E5%8A%B3",
+          "prtsUrls": [
+            "https://prts.wiki/w/ISW-SP_%E4%BB%A5%E9%80%B8%E5%BE%85%E5%8A%B3"
+          ],
+          "name": "以逸待劳"
+        },
+        {
+          "id": "c2afef51-e9d0-48d9-bd27-103ed18d4e72",
+          "floor": 5,
+          "type": "combat",
+          "stageId": "岁的界园志异|ISW-NO|一般作战 & 紧急作战|5|normal|青山不语",
+          "categoryId": "ISW-NO:normal:一般作战 & 紧急作战",
+          "categoryName": "一般作战",
+          "sectionCode": "ISW-NO",
+          "sectionName": "一般作战 & 紧急作战",
+          "prtsUrl": "https://prts.wiki/w/ISW-NO_%E9%9D%92%E5%B1%B1%E4%B8%8D%E8%AF%AD",
+          "prtsUrls": [
+            "https://prts.wiki/w/ISW-NO_%E9%9D%92%E5%B1%B1%E4%B8%8D%E8%AF%AD"
+          ],
+          "name": "青山不语"
+        },
+        {
+          "id": "ef531c5e-3753-48d6-bd3b-1fe5f58f8187",
+          "floor": 5,
+          "type": "combat",
+          "stageId": "岁的界园志异|ISW-NO|祸乱|0|default|凭器",
+          "categoryId": "ISW-NO:default:祸乱",
+          "categoryName": "祸乱",
+          "sectionCode": "ISW-NO",
+          "sectionName": "祸乱",
+          "prtsUrl": "https://prts.wiki/w/ISW-NO_%E5%87%AD%E5%99%A8",
+          "prtsUrls": [
+            "https://prts.wiki/w/ISW-NO_%E5%87%AD%E5%99%A8"
+          ],
+          "name": "凭器"
+        },
+        {
+          "id": "c33a6f2a-c2de-4bca-b628-e7df6b225d1a",
+          "floor": 5,
+          "type": "combat",
+          "stageId": "岁的界园志异|ISW-NO|祸乱|0|default|迷惘",
+          "categoryId": "ISW-NO:default:祸乱",
+          "categoryName": "祸乱",
+          "sectionCode": "ISW-NO",
+          "sectionName": "祸乱",
+          "prtsUrl": "https://prts.wiki/w/ISW-NO_%E8%BF%B7%E6%83%98",
+          "prtsUrls": [
+            "https://prts.wiki/w/ISW-NO_%E8%BF%B7%E6%83%98"
+          ],
+          "name": "迷惘"
+        },
+        {
+          "id": "dead3138-5900-45b3-a39b-dea3de261fe9",
+          "floor": 5,
+          "type": "combat",
+          "stageId": "岁的界园志异|ISW-NO|祸乱|0|default|震坎",
+          "categoryId": "ISW-NO:default:祸乱",
+          "categoryName": "祸乱",
+          "sectionCode": "ISW-NO",
+          "sectionName": "祸乱",
+          "prtsUrl": "https://prts.wiki/w/ISW-NO_%E9%9C%87%E5%9D%8E",
+          "prtsUrls": [
+            "https://prts.wiki/w/ISW-NO_%E9%9C%87%E5%9D%8E"
+          ],
+          "name": "震坎"
+        },
+        {
+          "id": "616d35f8-8b6d-49f0-b589-161c5ab86164",
+          "floor": 5,
+          "type": "combat",
+          "stageId": "岁的界园志异|ISW-NO|一般作战 & 紧急作战|5|normal|往事喑哑",
+          "categoryId": "ISW-NO:normal:一般作战 & 紧急作战",
+          "categoryName": "一般作战",
+          "sectionCode": "ISW-NO",
+          "sectionName": "一般作战 & 紧急作战",
+          "prtsUrl": "https://prts.wiki/w/ISW-NO_%E5%BE%80%E4%BA%8B%E5%96%91%E5%93%91",
+          "prtsUrls": [
+            "https://prts.wiki/w/ISW-NO_%E5%BE%80%E4%BA%8B%E5%96%91%E5%93%91"
+          ],
+          "name": "往事喑哑"
+        },
+        {
+          "id": "968306eb-fa8d-48dc-85f6-01d0b770769d",
+          "floor": 5,
+          "type": "combat",
+          "stageId": "岁的界园志异|ISW-NO|一般作战 & 紧急作战|5|normal|青山不语",
+          "categoryId": "ISW-NO:normal:一般作战 & 紧急作战",
+          "categoryName": "一般作战",
+          "sectionCode": "ISW-NO",
+          "sectionName": "一般作战 & 紧急作战",
+          "prtsUrl": "https://prts.wiki/w/ISW-NO_%E9%9D%92%E5%B1%B1%E4%B8%8D%E8%AF%AD",
+          "prtsUrls": [
+            "https://prts.wiki/w/ISW-NO_%E9%9D%92%E5%B1%B1%E4%B8%8D%E8%AF%AD"
+          ],
+          "name": "青山不语"
+        },
+        {
+          "id": "e74ef613-92c1-40a6-a1ef-f823c3298675",
+          "floor": 5,
+          "type": "combat",
+          "stageId": "岁的界园志异|ISW-NO & ISW-DF|险路恶敌|5|default|往昔难忆",
+          "categoryId": "ISW-NO & ISW-DF:default:险路恶敌",
+          "categoryName": "险路恶敌",
+          "sectionCode": "ISW-NO & ISW-DF",
+          "sectionName": "险路恶敌",
+          "prtsUrl": "https://prts.wiki/w/ISW-DF_%E5%BE%80%E6%98%94%E9%9A%BE%E5%BF%86",
+          "prtsUrls": [
+            "https://prts.wiki/w/ISW-DF_%E5%BE%80%E6%98%94%E9%9A%BE%E5%BF%86"
+          ],
+          "name": "往昔难忆"
+        },
+        {
+          "id": "e98c7b05-5381-4f63-850d-e5f09b989341",
+          "floor": 6,
+          "type": "combat",
+          "stageId": "岁的界园志异|ISW-NO|明烛试炼|0|default|赴陨 单座 / 二座",
+          "prtsUrl": "https://prts.wiki/w/ISW-NO_%E8%B5%B4%E9%99%A8(%E5%85%B6%E4%BA%8C)",
+          "prtsUrls": [
+            "https://prts.wiki/w/ISW-NO_%E8%B5%B4%E9%99%A8(%E5%85%B6%E4%BA%8C)",
+            "https://prts.wiki/w/ISW-NO_%E8%B5%B4%E9%99%A8"
+          ],
+          "categoryId": "ISW-NO:default:明烛试炼",
+          "categoryName": "明烛试炼",
+          "sectionCode": "ISW-NO",
+          "sectionName": "明烛试炼",
+          "name": "赴陨 单座 / 二座"
+        },
+        {
+          "id": "5bff8554-6757-4c36-98f8-d2529f52987c",
+          "floor": 6,
+          "type": "combat",
+          "stageId": "岁的界园志异|ISW-NO|祸乱|0|default|破局",
+          "categoryId": "ISW-NO:default:祸乱",
+          "categoryName": "祸乱",
+          "sectionCode": "ISW-NO",
+          "sectionName": "祸乱",
+          "prtsUrl": "https://prts.wiki/w/ISW-NO_%E7%A0%B4%E5%B1%80",
+          "prtsUrls": [
+            "https://prts.wiki/w/ISW-NO_%E7%A0%B4%E5%B1%80"
+          ],
+          "name": "破局"
+        },
+        {
+          "id": "d0a4962d-d1c0-43de-89bd-06f4f6cd74b1",
+          "floor": 6,
+          "type": "combat",
+          "stageId": "岁的界园志异|ISW-NO|祸乱|0|default|迷惘",
+          "categoryId": "ISW-NO:default:祸乱",
+          "categoryName": "祸乱",
+          "sectionCode": "ISW-NO",
+          "sectionName": "祸乱",
+          "prtsUrl": "https://prts.wiki/w/ISW-NO_%E8%BF%B7%E6%83%98",
+          "prtsUrls": [
+            "https://prts.wiki/w/ISW-NO_%E8%BF%B7%E6%83%98"
+          ],
+          "name": "迷惘"
+        },
+        {
+          "id": "058353bd-a9d8-4f17-8ce0-e85d9149ae3c",
+          "floor": 6,
+          "type": "combat",
+          "stageId": "岁的界园志异|ISW-NO|祸乱|0|default|地有四难",
+          "categoryId": "ISW-NO:default:祸乱",
+          "categoryName": "祸乱",
+          "sectionCode": "ISW-NO",
+          "sectionName": "祸乱",
+          "prtsUrl": "https://prts.wiki/w/ISW-NO_%E5%9C%B0%E6%9C%89%E5%9B%9B%E9%9A%BE",
+          "prtsUrls": [
+            "https://prts.wiki/w/ISW-NO_%E5%9C%B0%E6%9C%89%E5%9B%9B%E9%9A%BE"
+          ],
+          "name": "地有四难"
+        },
+        {
+          "id": "5b6c6b7a-20f0-4a5e-bbd4-4106b2e92863",
+          "floor": 6,
+          "type": "combat",
+          "stageId": "岁的界园志异|ISW-NO|祸乱|0|default|忘形",
+          "categoryId": "ISW-NO:default:祸乱",
+          "categoryName": "祸乱",
+          "sectionCode": "ISW-NO",
+          "sectionName": "祸乱",
+          "prtsUrl": "https://prts.wiki/w/ISW-NO_%E5%BF%98%E5%BD%A2",
+          "prtsUrls": [
+            "https://prts.wiki/w/ISW-NO_%E5%BF%98%E5%BD%A2"
+          ],
+          "name": "忘形"
+        },
+        {
+          "id": "0ad504f5-1287-46bd-9456-84a667dad619",
+          "floor": 6,
+          "type": "combat",
+          "stageId": "岁的界园志异|ISW-NO|祸乱|0|default|地有四难",
+          "categoryId": "ISW-NO:default:祸乱",
+          "categoryName": "祸乱",
+          "sectionCode": "ISW-NO",
+          "sectionName": "祸乱",
+          "prtsUrl": "https://prts.wiki/w/ISW-NO_%E5%9C%B0%E6%9C%89%E5%9B%9B%E9%9A%BE",
+          "prtsUrls": [
+            "https://prts.wiki/w/ISW-NO_%E5%9C%B0%E6%9C%89%E5%9B%9B%E9%9A%BE"
+          ],
+          "name": "地有四难"
+        },
+        {
+          "id": "6c2c9064-ce93-443c-b439-7c76a9821017",
+          "floor": 6,
+          "type": "combat",
+          "stageId": "岁的界园志异|ISW-NO|祸乱|0|default|愠怒",
+          "categoryId": "ISW-NO:default:祸乱",
+          "categoryName": "祸乱",
+          "sectionCode": "ISW-NO",
+          "sectionName": "祸乱",
+          "prtsUrl": "https://prts.wiki/w/ISW-NO_%E6%84%A0%E6%80%92",
+          "prtsUrls": [
+            "https://prts.wiki/w/ISW-NO_%E6%84%A0%E6%80%92"
+          ],
+          "name": "愠怒"
+        },
+        {
+          "id": "06249c97-88e0-4fb6-bd38-227a134ccaea",
+          "floor": 6,
+          "type": "combat",
+          "stageId": "岁的界园志异|ISW-NO|祸乱|0|default|靡靡之音",
+          "categoryId": "ISW-NO:default:祸乱",
+          "categoryName": "祸乱",
+          "sectionCode": "ISW-NO",
+          "sectionName": "祸乱",
+          "prtsUrl": "https://prts.wiki/w/ISW-NO_%E9%9D%A1%E9%9D%A1%E4%B9%8B%E9%9F%B3",
+          "prtsUrls": [
+            "https://prts.wiki/w/ISW-NO_%E9%9D%A1%E9%9D%A1%E4%B9%8B%E9%9F%B3"
+          ],
+          "name": "靡靡之音"
+        },
+        {
+          "id": "11a44f4c-636f-4435-9439-4da2e2feee94",
+          "floor": 6,
+          "type": "shop",
+          "name": "诡意行商",
+          "categoryId": "岁的界园志异|ROGUE TRADER",
+          "categoryName": "诡意行商",
+          "sectionCode": "ROGUE TRADER",
+          "sectionName": "事件节点"
+        },
+        {
+          "id": "99ae512a-32ae-48c6-b73a-dcfcdb26c88a",
+          "floor": 6,
+          "type": "combat",
+          "stageId": "岁的界园志异|ISW-SP|坎诺特的挑战|0|default|作壁上观",
+          "categoryId": "ISW-SP:default:坎诺特的挑战",
+          "categoryName": "坎诺特的挑战",
+          "sectionCode": "ISW-SP",
+          "sectionName": "坎诺特的挑战",
+          "prtsUrl": "https://prts.wiki/w/ISW-SP_%E4%BD%9C%E5%A3%81%E4%B8%8A%E8%A7%82",
+          "prtsUrls": [
+            "https://prts.wiki/w/ISW-SP_%E4%BD%9C%E5%A3%81%E4%B8%8A%E8%A7%82"
+          ],
+          "name": "作壁上观"
+        },
+        {
+          "id": "c45b7a6d-42aa-41a2-a769-3de611c4c7d9",
+          "floor": 6,
+          "type": "event",
+          "name": "命运所指",
+          "sectionName": "事件节点"
+        },
+        {
+          "id": "5d459a14-6f96-40ba-91c2-fa401b9fa6d8",
+          "floor": 6,
+          "type": "combat",
+          "stageId": "岁的界园志异|ISW-NO & ISW-DF|险路恶敌|0|default|末狩",
+          "categoryId": "ISW-NO & ISW-DF:default:险路恶敌",
+          "categoryName": "险路恶敌",
+          "sectionCode": "ISW-NO & ISW-DF",
+          "sectionName": "险路恶敌",
+          "prtsUrl": "https://prts.wiki/w/ISW-DF_%E6%9C%AB%E7%8B%A9",
+          "prtsUrls": [
+            "https://prts.wiki/w/ISW-DF_%E6%9C%AB%E7%8B%A9"
+          ],
+          "name": "末狩"
+        },
+        {
+          "id": "7f1241c4-ace0-4c47-9ae8-2ac1493cf931",
+          "floor": 6,
+          "type": "combat",
+          "stageId": "岁的界园志异|ISW-NO & ISW-DF|险路恶敌|0|default|止变（役群兽）",
+          "categoryId": "ISW-NO & ISW-DF:default:险路恶敌",
+          "categoryName": "险路恶敌",
+          "sectionCode": "ISW-NO & ISW-DF",
+          "sectionName": "险路恶敌",
+          "prtsUrl": "https://prts.wiki/w/ISW-DF_%E6%AD%A2%E5%8F%98(%E5%BD%B9%E7%BE%A4%E5%85%BD)",
+          "prtsUrls": [
+            "https://prts.wiki/w/ISW-DF_%E6%AD%A2%E5%8F%98(%E5%BD%B9%E7%BE%A4%E5%85%BD)"
+          ],
+          "name": "止变（役群兽）"
+        }
+      ],
+      "operators": [
+        {
+          "operatorId": "玛恩纳",
+          "cells": {
+            "71e78a93-6612-4cd7-b6c8-839b8f5990ad": {
+              "recruitType": "normal",
+              "elite": 2
+            },
+            "848d48ea-c782-4cf5-ae40-a86dd801a8c8": {
+              "skill": 3,
+              "deployed": true,
+              "used": true
+            },
+            "766dcc68-520c-4a21-994a-4c1aa38c686c": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "eaf9c721-33fd-43ed-becc-6b4aa1a4d3a7": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "8f6820de-2c98-4361-9c8b-bfb92e939efe": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "8fbc8beb-2af1-4996-b0cc-a3cb91541649": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "2f040533-ca02-4cf0-8c9b-17bfb7a11cb9": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "bb93ebba-afb3-4369-877e-0a5d012b9fac": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "e1bbf47a-8cbc-4e50-951b-471e2a685762": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "bfc8ce99-2428-4e1d-9881-03a462426851": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "84229086-0d75-412f-babd-8b9d23197bf6": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "31ea9017-73d6-4b1d-94a2-b2272e65c0eb": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "09f6bb9c-4fdb-4d5e-ba66-90fbc3e4d2bf": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "42e6b0c1-df64-450d-b3f2-51ca6bf3774e": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "8923aff8-a2d7-45c3-8da9-f86fb7de3121": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "63c09f0b-8a93-4098-b950-689d5f6dba5b": {
+              "deployed": true,
+              "skill": 3
+            },
+            "bd3642d1-4261-4215-aca0-ca1000aeb32d": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "68f3b5cc-cffa-437b-9f1a-98fd5a8409dd": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "c2afef51-e9d0-48d9-bd27-103ed18d4e72": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "ef531c5e-3753-48d6-bd3b-1fe5f58f8187": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "c33a6f2a-c2de-4bca-b628-e7df6b225d1a": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "dead3138-5900-45b3-a39b-dea3de261fe9": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "616d35f8-8b6d-49f0-b589-161c5ab86164": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "968306eb-fa8d-48dc-85f6-01d0b770769d": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "e74ef613-92c1-40a6-a1ef-f823c3298675": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "e98c7b05-5381-4f63-850d-e5f09b989341": {
+              "deployed": true,
+              "skill": 3
+            },
+            "5bff8554-6757-4c36-98f8-d2529f52987c": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "d0a4962d-d1c0-43de-89bd-06f4f6cd74b1": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "058353bd-a9d8-4f17-8ce0-e85d9149ae3c": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "5b6c6b7a-20f0-4a5e-bbd4-4106b2e92863": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "0ad504f5-1287-46bd-9456-84a667dad619": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "6c2c9064-ce93-443c-b439-7c76a9821017": {
+              "deployed": true,
+              "skill": 3
+            },
+            "06249c97-88e0-4fb6-bd38-227a134ccaea": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "99ae512a-32ae-48c6-b73a-dcfcdb26c88a": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "5d459a14-6f96-40ba-91c2-fa401b9fa6d8": {
+              "deployed": false
+            },
+            "7f1241c4-ace0-4c47-9ae8-2ac1493cf931": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            }
+          }
+        },
+        {
+          "operatorId": "罗比菈塔",
+          "cells": {
+            "71e78a93-6612-4cd7-b6c8-839b8f5990ad": {
+              "recruitType": "normal",
+              "elite": 1
+            },
+            "848d48ea-c782-4cf5-ae40-a86dd801a8c8": {
+              "skill": 2,
+              "deployed": true,
+              "used": true
+            },
+            "766dcc68-520c-4a21-994a-4c1aa38c686c": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "eaf9c721-33fd-43ed-becc-6b4aa1a4d3a7": {
+              "deployed": true,
+              "skill": 2
+            },
+            "8f6820de-2c98-4361-9c8b-bfb92e939efe": {
+              "deployed": true,
+              "skill": 2
+            },
+            "8fbc8beb-2af1-4996-b0cc-a3cb91541649": {
+              "deployed": false
+            },
+            "42e6b0c1-df64-450d-b3f2-51ca6bf3774e": {
+              "deployed": true,
+              "skill": 2
+            },
+            "8923aff8-a2d7-45c3-8da9-f86fb7de3121": {
+              "deployed": false
+            }
+          }
+        },
+        {
+          "operatorId": "清流",
+          "cells": {
+            "71e78a93-6612-4cd7-b6c8-839b8f5990ad": {
+              "recruitType": "normal",
+              "elite": 1
+            },
+            "848d48ea-c782-4cf5-ae40-a86dd801a8c8": {
+              "skill": 2,
+              "deployed": true,
+              "elite": 1,
+              "used": true
+            },
+            "766dcc68-520c-4a21-994a-4c1aa38c686c": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "eaf9c721-33fd-43ed-becc-6b4aa1a4d3a7": {
+              "deployed": true,
+              "skill": 2
+            },
+            "8f6820de-2c98-4361-9c8b-bfb92e939efe": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "8fbc8beb-2af1-4996-b0cc-a3cb91541649": {
+              "deployed": false
+            },
+            "bb93ebba-afb3-4369-877e-0a5d012b9fac": {
+              "deployed": false
+            },
+            "e1bbf47a-8cbc-4e50-951b-471e2a685762": {
+              "deployed": true,
+              "skill": 1,
+              "used": true
+            },
+            "bfc8ce99-2428-4e1d-9881-03a462426851": {
+              "deployed": true,
+              "skill": 1,
+              "used": true
+            },
+            "84229086-0d75-412f-babd-8b9d23197bf6": {
+              "deployed": true,
+              "skill": 1,
+              "used": true
+            },
+            "31ea9017-73d6-4b1d-94a2-b2272e65c0eb": {
+              "deployed": true,
+              "skill": 1,
+              "used": true
+            },
+            "09f6bb9c-4fdb-4d5e-ba66-90fbc3e4d2bf": {
+              "deployed": true,
+              "skill": 1,
+              "used": true
+            },
+            "42e6b0c1-df64-450d-b3f2-51ca6bf3774e": {
+              "deployed": true,
+              "skill": 1,
+              "used": true
+            },
+            "8923aff8-a2d7-45c3-8da9-f86fb7de3121": {
+              "deployed": true,
+              "skill": 1,
+              "used": true
+            },
+            "63c09f0b-8a93-4098-b950-689d5f6dba5b": {
+              "deployed": true,
+              "skill": 1
+            },
+            "bd3642d1-4261-4215-aca0-ca1000aeb32d": {
+              "deployed": true,
+              "skill": 1,
+              "used": true
+            },
+            "68f3b5cc-cffa-437b-9f1a-98fd5a8409dd": {
+              "deployed": true,
+              "skill": 1,
+              "used": true
+            },
+            "c2afef51-e9d0-48d9-bd27-103ed18d4e72": {
+              "deployed": false
+            }
+          }
+        },
+        {
+          "operatorId": "骋风",
+          "cells": {
+            "766dcc68-520c-4a21-994a-4c1aa38c686c": {
+              "recruitType": "normal",
+              "elite": 1
+            },
+            "d46579a8-0e45-45f8-8d52-b4726da82628": {
+              "deployed": false,
+              "promotionAfter": 2
+            },
+            "eaf9c721-33fd-43ed-becc-6b4aa1a4d3a7": {
+              "skill": 2,
+              "deployed": true,
+              "used": true
+            },
+            "8f6820de-2c98-4361-9c8b-bfb92e939efe": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "8fbc8beb-2af1-4996-b0cc-a3cb91541649": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "2f040533-ca02-4cf0-8c9b-17bfb7a11cb9": {
+              "deployed": true,
+              "skill": 2
+            },
+            "bb93ebba-afb3-4369-877e-0a5d012b9fac": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "e1bbf47a-8cbc-4e50-951b-471e2a685762": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "bfc8ce99-2428-4e1d-9881-03a462426851": {
+              "deployed": true,
+              "skill": 2
+            },
+            "84229086-0d75-412f-babd-8b9d23197bf6": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "31ea9017-73d6-4b1d-94a2-b2272e65c0eb": {
+              "deployed": true,
+              "skill": 2
+            },
+            "09f6bb9c-4fdb-4d5e-ba66-90fbc3e4d2bf": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "42e6b0c1-df64-450d-b3f2-51ca6bf3774e": {
+              "deployed": false
+            },
+            "c2afef51-e9d0-48d9-bd27-103ed18d4e72": {
+              "deployed": true,
+              "skill": 2
+            },
+            "ef531c5e-3753-48d6-bd3b-1fe5f58f8187": {
+              "deployed": true,
+              "skill": 2
+            },
+            "c33a6f2a-c2de-4bca-b628-e7df6b225d1a": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "dead3138-5900-45b3-a39b-dea3de261fe9": {
+              "deployed": true,
+              "skill": 2
+            },
+            "616d35f8-8b6d-49f0-b589-161c5ab86164": {
+              "deployed": true,
+              "skill": 2
+            },
+            "968306eb-fa8d-48dc-85f6-01d0b770769d": {
+              "deployed": true,
+              "skill": 2
+            },
+            "e74ef613-92c1-40a6-a1ef-f823c3298675": {
+              "deployed": false
+            },
+            "5bff8554-6757-4c36-98f8-d2529f52987c": {
+              "deployed": true,
+              "skill": 2
+            },
+            "d0a4962d-d1c0-43de-89bd-06f4f6cd74b1": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "058353bd-a9d8-4f17-8ce0-e85d9149ae3c": {
+              "deployed": true,
+              "skill": 2
+            },
+            "5b6c6b7a-20f0-4a5e-bbd4-4106b2e92863": {
+              "deployed": true,
+              "skill": 2
+            },
+            "0ad504f5-1287-46bd-9456-84a667dad619": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "6c2c9064-ce93-443c-b439-7c76a9821017": {
+              "deployed": true,
+              "skill": 2
+            },
+            "06249c97-88e0-4fb6-bd38-227a134ccaea": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "99ae512a-32ae-48c6-b73a-dcfcdb26c88a": {
+              "deployed": true,
+              "skill": 2
+            },
+            "5d459a14-6f96-40ba-91c2-fa401b9fa6d8": {
+              "deployed": false
+            }
+          }
+        },
+        {
+          "operatorId": "凛御银灰",
+          "cells": {
+            "d46579a8-0e45-45f8-8d52-b4726da82628": {
+              "recruitType": "normal",
+              "elite": 2
+            },
+            "eaf9c721-33fd-43ed-becc-6b4aa1a4d3a7": {
+              "skill": 2,
+              "deployed": true,
+              "used": true
+            },
+            "8f6820de-2c98-4361-9c8b-bfb92e939efe": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "8fbc8beb-2af1-4996-b0cc-a3cb91541649": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "2f040533-ca02-4cf0-8c9b-17bfb7a11cb9": {
+              "deployed": true,
+              "skill": 2
+            },
+            "bb93ebba-afb3-4369-877e-0a5d012b9fac": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "e1bbf47a-8cbc-4e50-951b-471e2a685762": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "bfc8ce99-2428-4e1d-9881-03a462426851": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "84229086-0d75-412f-babd-8b9d23197bf6": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "31ea9017-73d6-4b1d-94a2-b2272e65c0eb": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "09f6bb9c-4fdb-4d5e-ba66-90fbc3e4d2bf": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "42e6b0c1-df64-450d-b3f2-51ca6bf3774e": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "8923aff8-a2d7-45c3-8da9-f86fb7de3121": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "63c09f0b-8a93-4098-b950-689d5f6dba5b": {
+              "deployed": true,
+              "skill": 2
+            },
+            "bd3642d1-4261-4215-aca0-ca1000aeb32d": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "68f3b5cc-cffa-437b-9f1a-98fd5a8409dd": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "c2afef51-e9d0-48d9-bd27-103ed18d4e72": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "ef531c5e-3753-48d6-bd3b-1fe5f58f8187": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "c33a6f2a-c2de-4bca-b628-e7df6b225d1a": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "dead3138-5900-45b3-a39b-dea3de261fe9": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "616d35f8-8b6d-49f0-b589-161c5ab86164": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "968306eb-fa8d-48dc-85f6-01d0b770769d": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "e74ef613-92c1-40a6-a1ef-f823c3298675": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "e98c7b05-5381-4f63-850d-e5f09b989341": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "5bff8554-6757-4c36-98f8-d2529f52987c": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "d0a4962d-d1c0-43de-89bd-06f4f6cd74b1": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "058353bd-a9d8-4f17-8ce0-e85d9149ae3c": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "5b6c6b7a-20f0-4a5e-bbd4-4106b2e92863": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "0ad504f5-1287-46bd-9456-84a667dad619": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "6c2c9064-ce93-443c-b439-7c76a9821017": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "06249c97-88e0-4fb6-bd38-227a134ccaea": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "99ae512a-32ae-48c6-b73a-dcfcdb26c88a": {
+              "deployed": false
+            },
+            "5d459a14-6f96-40ba-91c2-fa401b9fa6d8": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "7f1241c4-ace0-4c47-9ae8-2ac1493cf931": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            }
+          }
+        },
+        {
+          "operatorId": "阿米娅",
+          "cells": {
+            "d46579a8-0e45-45f8-8d52-b4726da82628": {
+              "recruitType": "normal",
+              "elite": 1,
+              "formId": "阿米娅(医疗)"
+            },
+            "eaf9c721-33fd-43ed-becc-6b4aa1a4d3a7": {
+              "skill": 2,
+              "deployed": true,
+              "used": true,
+              "formId": "阿米娅(医疗)"
+            },
+            "8f6820de-2c98-4361-9c8b-bfb92e939efe": {
+              "deployed": false,
+              "formId": "阿米娅(医疗)"
+            },
+            "50ffa5a7-c7dc-4403-bb21-ad4c575ab1a9": {
+              "promotionAfter": 2,
+              "formId": "阿米娅(医疗)"
+            },
+            "8fbc8beb-2af1-4996-b0cc-a3cb91541649": {
+              "deployed": true,
+              "skill": 2,
+              "used": true,
+              "formId": "阿米娅(医疗)"
+            },
+            "2f040533-ca02-4cf0-8c9b-17bfb7a11cb9": {
+              "deployed": true,
+              "skill": 2,
+              "used": true,
+              "formId": "阿米娅(医疗)"
+            },
+            "bb93ebba-afb3-4369-877e-0a5d012b9fac": {
+              "deployed": true,
+              "skill": 2,
+              "used": true,
+              "formId": "阿米娅(医疗)"
+            },
+            "e1bbf47a-8cbc-4e50-951b-471e2a685762": {
+              "deployed": true,
+              "skill": 2,
+              "formId": "阿米娅(医疗)",
+              "used": true
+            },
+            "bfc8ce99-2428-4e1d-9881-03a462426851": {
+              "deployed": true,
+              "skill": 2,
+              "formId": "阿米娅(医疗)",
+              "used": true
+            },
+            "84229086-0d75-412f-babd-8b9d23197bf6": {
+              "deployed": true,
+              "skill": 2,
+              "formId": "阿米娅(医疗)"
+            },
+            "31ea9017-73d6-4b1d-94a2-b2272e65c0eb": {
+              "deployed": true,
+              "skill": 2,
+              "formId": "阿米娅(医疗)",
+              "used": true
+            },
+            "09f6bb9c-4fdb-4d5e-ba66-90fbc3e4d2bf": {
+              "deployed": true,
+              "skill": 2,
+              "formId": "阿米娅(医疗)",
+              "used": true
+            },
+            "42e6b0c1-df64-450d-b3f2-51ca6bf3774e": {
+              "deployed": true,
+              "skill": 2,
+              "formId": "阿米娅(医疗)",
+              "used": true
+            },
+            "8923aff8-a2d7-45c3-8da9-f86fb7de3121": {
+              "deployed": true,
+              "skill": 2,
+              "formId": "阿米娅(医疗)"
+            },
+            "63c09f0b-8a93-4098-b950-689d5f6dba5b": {
+              "deployed": true,
+              "skill": 2,
+              "formId": "阿米娅(医疗)"
+            },
+            "bd3642d1-4261-4215-aca0-ca1000aeb32d": {
+              "deployed": false,
+              "formId": "阿米娅(医疗)"
+            },
+            "68f3b5cc-cffa-437b-9f1a-98fd5a8409dd": {
+              "skill": 2,
+              "deployed": true,
+              "used": true
+            },
+            "c2afef51-e9d0-48d9-bd27-103ed18d4e72": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "ef531c5e-3753-48d6-bd3b-1fe5f58f8187": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "c33a6f2a-c2de-4bca-b628-e7df6b225d1a": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "dead3138-5900-45b3-a39b-dea3de261fe9": {
+              "deployed": true,
+              "skill": 2
+            },
+            "616d35f8-8b6d-49f0-b589-161c5ab86164": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "968306eb-fa8d-48dc-85f6-01d0b770769d": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "e74ef613-92c1-40a6-a1ef-f823c3298675": {
+              "deployed": false
+            },
+            "5bff8554-6757-4c36-98f8-d2529f52987c": {
+              "deployed": true,
+              "skill": 2
+            },
+            "d0a4962d-d1c0-43de-89bd-06f4f6cd74b1": {
+              "deployed": true,
+              "skill": 2
+            },
+            "058353bd-a9d8-4f17-8ce0-e85d9149ae3c": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "5b6c6b7a-20f0-4a5e-bbd4-4106b2e92863": {
+              "deployed": true,
+              "skill": 2
+            },
+            "0ad504f5-1287-46bd-9456-84a667dad619": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "6c2c9064-ce93-443c-b439-7c76a9821017": {
+              "deployed": true,
+              "skill": 2
+            },
+            "06249c97-88e0-4fb6-bd38-227a134ccaea": {
+              "deployed": true,
+              "skill": 2
+            },
+            "99ae512a-32ae-48c6-b73a-dcfcdb26c88a": {
+              "deployed": true,
+              "skill": 2
+            },
+            "5d459a14-6f96-40ba-91c2-fa401b9fa6d8": {
+              "deployed": false
+            }
+          }
+        },
+        {
+          "operatorId": "古米",
+          "cells": {
+            "d46579a8-0e45-45f8-8d52-b4726da82628": {
+              "recruitType": "normal",
+              "elite": 1
+            },
+            "eaf9c721-33fd-43ed-becc-6b4aa1a4d3a7": {
+              "skill": 1,
+              "deployed": true,
+              "used": true
+            },
+            "8f6820de-2c98-4361-9c8b-bfb92e939efe": {
+              "deployed": true,
+              "skill": 1
+            },
+            "8fbc8beb-2af1-4996-b0cc-a3cb91541649": {
+              "deployed": true,
+              "skill": 1,
+              "used": true
+            },
+            "2f040533-ca02-4cf0-8c9b-17bfb7a11cb9": {
+              "deployed": true,
+              "skill": 1,
+              "used": true
+            },
+            "bb93ebba-afb3-4369-877e-0a5d012b9fac": {
+              "deployed": true,
+              "skill": 1,
+              "used": true
+            },
+            "e1bbf47a-8cbc-4e50-951b-471e2a685762": {
+              "deployed": true,
+              "skill": 1,
+              "used": true
+            },
+            "bfc8ce99-2428-4e1d-9881-03a462426851": {
+              "deployed": true,
+              "skill": 1
+            },
+            "84229086-0d75-412f-babd-8b9d23197bf6": {
+              "deployed": true,
+              "skill": 1,
+              "used": true
+            },
+            "31ea9017-73d6-4b1d-94a2-b2272e65c0eb": {
+              "deployed": true,
+              "skill": 1
+            },
+            "09f6bb9c-4fdb-4d5e-ba66-90fbc3e4d2bf": {
+              "deployed": true,
+              "skill": 1,
+              "used": true
+            },
+            "42e6b0c1-df64-450d-b3f2-51ca6bf3774e": {
+              "deployed": true,
+              "skill": 1,
+              "used": true
+            },
+            "8923aff8-a2d7-45c3-8da9-f86fb7de3121": {
+              "deployed": true,
+              "skill": 1
+            },
+            "63c09f0b-8a93-4098-b950-689d5f6dba5b": {
+              "deployed": false
+            },
+            "ef531c5e-3753-48d6-bd3b-1fe5f58f8187": {
+              "deployed": true,
+              "skill": 1
+            },
+            "c33a6f2a-c2de-4bca-b628-e7df6b225d1a": {
+              "deployed": true,
+              "skill": 1,
+              "used": true
+            },
+            "dead3138-5900-45b3-a39b-dea3de261fe9": {
+              "deployed": true,
+              "skill": 1
+            },
+            "616d35f8-8b6d-49f0-b589-161c5ab86164": {
+              "deployed": true,
+              "skill": 1
+            },
+            "968306eb-fa8d-48dc-85f6-01d0b770769d": {
+              "deployed": true,
+              "skill": 1,
+              "used": true
+            },
+            "e74ef613-92c1-40a6-a1ef-f823c3298675": {
+              "deployed": false
+            },
+            "06249c97-88e0-4fb6-bd38-227a134ccaea": {
+              "deployed": true,
+              "skill": 1,
+              "used": true
+            },
+            "99ae512a-32ae-48c6-b73a-dcfcdb26c88a": {
+              "deployed": true,
+              "skill": 1
+            },
+            "5d459a14-6f96-40ba-91c2-fa401b9fa6d8": {
+              "deployed": false
+            }
+          }
+        },
+        {
+          "operatorId": "罗小黑",
+          "cells": {
+            "eaf9c721-33fd-43ed-becc-6b4aa1a4d3a7": {
+              "recruitType": "normal",
+              "elite": 1
+            },
+            "8f6820de-2c98-4361-9c8b-bfb92e939efe": {
+              "skill": 1,
+              "deployed": true
+            },
+            "8fbc8beb-2af1-4996-b0cc-a3cb91541649": {
+              "deployed": false
+            }
+          }
+        },
+        {
+          "operatorId": "Castle-3",
+          "cells": {
+            "8f6820de-2c98-4361-9c8b-bfb92e939efe": {
+              "recruitType": "normal",
+              "elite": 1
+            }
+          }
+        },
+        {
+          "operatorId": "豆苗",
+          "cells": {
+            "8fbc8beb-2af1-4996-b0cc-a3cb91541649": {
+              "recruitType": "normal",
+              "elite": 1
+            },
+            "84229086-0d75-412f-babd-8b9d23197bf6": {
+              "deployed": true,
+              "skill": 1
+            },
+            "31ea9017-73d6-4b1d-94a2-b2272e65c0eb": {
+              "deployed": true,
+              "skill": 1
+            },
+            "09f6bb9c-4fdb-4d5e-ba66-90fbc3e4d2bf": {
+              "deployed": false
+            },
+            "bd3642d1-4261-4215-aca0-ca1000aeb32d": {
+              "deployed": true,
+              "skill": 1,
+              "used": true
+            },
+            "68f3b5cc-cffa-437b-9f1a-98fd5a8409dd": {
+              "deployed": false
+            },
+            "e74ef613-92c1-40a6-a1ef-f823c3298675": {
+              "deployed": true,
+              "skill": 1,
+              "used": true
+            },
+            "e98c7b05-5381-4f63-850d-e5f09b989341": {
+              "deployed": false
+            }
+          }
+        },
+        {
+          "operatorId": "灵知",
+          "cells": {
+            "2f040533-ca02-4cf0-8c9b-17bfb7a11cb9": {
+              "recruitType": "normal",
+              "elite": 1
+            },
+            "e1bbf47a-8cbc-4e50-951b-471e2a685762": {
+              "deployed": true,
+              "skill": 2
+            },
+            "bfc8ce99-2428-4e1d-9881-03a462426851": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "84229086-0d75-412f-babd-8b9d23197bf6": {
+              "deployed": true,
+              "skill": 2,
+              "used": true,
+              "promotionAfter": 2
+            },
+            "31ea9017-73d6-4b1d-94a2-b2272e65c0eb": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "09f6bb9c-4fdb-4d5e-ba66-90fbc3e4d2bf": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "42e6b0c1-df64-450d-b3f2-51ca6bf3774e": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "8923aff8-a2d7-45c3-8da9-f86fb7de3121": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "63c09f0b-8a93-4098-b950-689d5f6dba5b": {
+              "deployed": true,
+              "skill": 2
+            },
+            "bd3642d1-4261-4215-aca0-ca1000aeb32d": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "68f3b5cc-cffa-437b-9f1a-98fd5a8409dd": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "c2afef51-e9d0-48d9-bd27-103ed18d4e72": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "ef531c5e-3753-48d6-bd3b-1fe5f58f8187": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "c33a6f2a-c2de-4bca-b628-e7df6b225d1a": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "dead3138-5900-45b3-a39b-dea3de261fe9": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "616d35f8-8b6d-49f0-b589-161c5ab86164": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "968306eb-fa8d-48dc-85f6-01d0b770769d": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "e74ef613-92c1-40a6-a1ef-f823c3298675": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "e98c7b05-5381-4f63-850d-e5f09b989341": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "5bff8554-6757-4c36-98f8-d2529f52987c": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "d0a4962d-d1c0-43de-89bd-06f4f6cd74b1": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "058353bd-a9d8-4f17-8ce0-e85d9149ae3c": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "5b6c6b7a-20f0-4a5e-bbd4-4106b2e92863": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "0ad504f5-1287-46bd-9456-84a667dad619": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "6c2c9064-ce93-443c-b439-7c76a9821017": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "06249c97-88e0-4fb6-bd38-227a134ccaea": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "99ae512a-32ae-48c6-b73a-dcfcdb26c88a": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "5d459a14-6f96-40ba-91c2-fa401b9fa6d8": {
+              "deployed": false
+            },
+            "7f1241c4-ace0-4c47-9ae8-2ac1493cf931": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            }
+          }
+        },
+        {
+          "operatorId": "斩业星熊",
+          "cells": {
+            "bb93ebba-afb3-4369-877e-0a5d012b9fac": {
+              "recruitType": "normal",
+              "elite": 1
+            },
+            "e1bbf47a-8cbc-4e50-951b-471e2a685762": {
+              "deployed": true,
+              "skill": 2,
+              "used": true,
+              "promotionAfter": 2
+            },
+            "bfc8ce99-2428-4e1d-9881-03a462426851": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "84229086-0d75-412f-babd-8b9d23197bf6": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "31ea9017-73d6-4b1d-94a2-b2272e65c0eb": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "09f6bb9c-4fdb-4d5e-ba66-90fbc3e4d2bf": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "42e6b0c1-df64-450d-b3f2-51ca6bf3774e": {
+              "deployed": true,
+              "skill": 3
+            },
+            "8923aff8-a2d7-45c3-8da9-f86fb7de3121": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "63c09f0b-8a93-4098-b950-689d5f6dba5b": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "bd3642d1-4261-4215-aca0-ca1000aeb32d": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "68f3b5cc-cffa-437b-9f1a-98fd5a8409dd": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "c2afef51-e9d0-48d9-bd27-103ed18d4e72": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "ef531c5e-3753-48d6-bd3b-1fe5f58f8187": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "c33a6f2a-c2de-4bca-b628-e7df6b225d1a": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "dead3138-5900-45b3-a39b-dea3de261fe9": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "616d35f8-8b6d-49f0-b589-161c5ab86164": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "968306eb-fa8d-48dc-85f6-01d0b770769d": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "e74ef613-92c1-40a6-a1ef-f823c3298675": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "e98c7b05-5381-4f63-850d-e5f09b989341": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "5bff8554-6757-4c36-98f8-d2529f52987c": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "d0a4962d-d1c0-43de-89bd-06f4f6cd74b1": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "058353bd-a9d8-4f17-8ce0-e85d9149ae3c": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "5b6c6b7a-20f0-4a5e-bbd4-4106b2e92863": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "0ad504f5-1287-46bd-9456-84a667dad619": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "6c2c9064-ce93-443c-b439-7c76a9821017": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "06249c97-88e0-4fb6-bd38-227a134ccaea": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "99ae512a-32ae-48c6-b73a-dcfcdb26c88a": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "5d459a14-6f96-40ba-91c2-fa401b9fa6d8": {
+              "deployed": false
+            },
+            "7f1241c4-ace0-4c47-9ae8-2ac1493cf931": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            }
+          }
+        },
+        {
+          "operatorId": "角峰",
+          "cells": {
+            "bfc8ce99-2428-4e1d-9881-03a462426851": {
+              "recruitType": "normal",
+              "elite": 1
+            },
+            "c45b7a6d-42aa-41a2-a769-3de611c4c7d9": {
+              "promotionAfter": 2
+            },
+            "5d459a14-6f96-40ba-91c2-fa401b9fa6d8": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "7f1241c4-ace0-4c47-9ae8-2ac1493cf931": {}
+          }
+        },
+        {
+          "operatorId": "焰狐龙梓兰",
+          "cells": {
+            "31ea9017-73d6-4b1d-94a2-b2272e65c0eb": {
+              "recruitType": "normal",
+              "elite": 1
+            },
+            "09f6bb9c-4fdb-4d5e-ba66-90fbc3e4d2bf": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "42e6b0c1-df64-450d-b3f2-51ca6bf3774e": {
+              "deployed": false
+            },
+            "8923aff8-a2d7-45c3-8da9-f86fb7de3121": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "63c09f0b-8a93-4098-b950-689d5f6dba5b": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "bd3642d1-4261-4215-aca0-ca1000aeb32d": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "68f3b5cc-cffa-437b-9f1a-98fd5a8409dd": {
+              "deployed": true,
+              "skill": 2,
+              "used": true,
+              "promotionAfter": 2
+            },
+            "c2afef51-e9d0-48d9-bd27-103ed18d4e72": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "ef531c5e-3753-48d6-bd3b-1fe5f58f8187": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "c33a6f2a-c2de-4bca-b628-e7df6b225d1a": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "dead3138-5900-45b3-a39b-dea3de261fe9": {
+              "deployed": true,
+              "skill": 2
+            },
+            "616d35f8-8b6d-49f0-b589-161c5ab86164": {
+              "deployed": true,
+              "skill": 2
+            },
+            "968306eb-fa8d-48dc-85f6-01d0b770769d": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "e74ef613-92c1-40a6-a1ef-f823c3298675": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "e98c7b05-5381-4f63-850d-e5f09b989341": {
+              "deployed": true,
+              "skill": 2
+            },
+            "5bff8554-6757-4c36-98f8-d2529f52987c": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "d0a4962d-d1c0-43de-89bd-06f4f6cd74b1": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "058353bd-a9d8-4f17-8ce0-e85d9149ae3c": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "5b6c6b7a-20f0-4a5e-bbd4-4106b2e92863": {
+              "deployed": true,
+              "skill": 2
+            },
+            "0ad504f5-1287-46bd-9456-84a667dad619": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "6c2c9064-ce93-443c-b439-7c76a9821017": {
+              "deployed": true,
+              "skill": 2
+            },
+            "06249c97-88e0-4fb6-bd38-227a134ccaea": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "99ae512a-32ae-48c6-b73a-dcfcdb26c88a": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "5d459a14-6f96-40ba-91c2-fa401b9fa6d8": {
+              "deployed": false
+            },
+            "7f1241c4-ace0-4c47-9ae8-2ac1493cf931": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            }
+          }
+        },
+        {
+          "operatorId": "夜刀",
+          "cells": {
+            "09f6bb9c-4fdb-4d5e-ba66-90fbc3e4d2bf": {
+              "recruitType": "normal",
+              "elite": 1
+            },
+            "63c09f0b-8a93-4098-b950-689d5f6dba5b": {
+              "deployed": true
+            },
+            "bd3642d1-4261-4215-aca0-ca1000aeb32d": {
+              "deployed": true,
+              "used": true
+            },
+            "68f3b5cc-cffa-437b-9f1a-98fd5a8409dd": {
+              "deployed": true
+            },
+            "c2afef51-e9d0-48d9-bd27-103ed18d4e72": {
+              "deployed": true
+            },
+            "ef531c5e-3753-48d6-bd3b-1fe5f58f8187": {
+              "deployed": false
+            },
+            "c33a6f2a-c2de-4bca-b628-e7df6b225d1a": {
+              "deployed": false
+            },
+            "616d35f8-8b6d-49f0-b589-161c5ab86164": {
+              "deployed": true
+            },
+            "968306eb-fa8d-48dc-85f6-01d0b770769d": {
+              "deployed": true
+            },
+            "e74ef613-92c1-40a6-a1ef-f823c3298675": {
+              "deployed": true,
+              "used": true
+            },
+            "e98c7b05-5381-4f63-850d-e5f09b989341": {
+              "deployed": true,
+              "used": true
+            },
+            "5bff8554-6757-4c36-98f8-d2529f52987c": {
+              "deployed": true
+            },
+            "d0a4962d-d1c0-43de-89bd-06f4f6cd74b1": {
+              "deployed": true
+            },
+            "058353bd-a9d8-4f17-8ce0-e85d9149ae3c": {
+              "deployed": true
+            },
+            "5b6c6b7a-20f0-4a5e-bbd4-4106b2e92863": {
+              "deployed": true
+            },
+            "0ad504f5-1287-46bd-9456-84a667dad619": {
+              "deployed": true,
+              "used": true
+            },
+            "6c2c9064-ce93-443c-b439-7c76a9821017": {
+              "deployed": true
+            },
+            "06249c97-88e0-4fb6-bd38-227a134ccaea": {
+              "deployed": true
+            },
+            "99ae512a-32ae-48c6-b73a-dcfcdb26c88a": {
+              "deployed": true
+            },
+            "5d459a14-6f96-40ba-91c2-fa401b9fa6d8": {
+              "deployed": false
+            }
+          }
+        },
+        {
+          "operatorId": "贝洛内",
+          "cells": {
+            "4f03f18d-b8b4-4e51-9c84-53bd2aba97d6": {
+              "recruitType": "normal",
+              "elite": 1
+            },
+            "42e6b0c1-df64-450d-b3f2-51ca6bf3774e": {
+              "deployed": true,
+              "skill": 2,
+              "used": true,
+              "promotionAfter": 2
+            },
+            "8923aff8-a2d7-45c3-8da9-f86fb7de3121": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "63c09f0b-8a93-4098-b950-689d5f6dba5b": {
+              "deployed": true,
+              "skill": 2
+            },
+            "bd3642d1-4261-4215-aca0-ca1000aeb32d": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "68f3b5cc-cffa-437b-9f1a-98fd5a8409dd": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "c2afef51-e9d0-48d9-bd27-103ed18d4e72": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "ef531c5e-3753-48d6-bd3b-1fe5f58f8187": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "c33a6f2a-c2de-4bca-b628-e7df6b225d1a": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "dead3138-5900-45b3-a39b-dea3de261fe9": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "616d35f8-8b6d-49f0-b589-161c5ab86164": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "968306eb-fa8d-48dc-85f6-01d0b770769d": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "e74ef613-92c1-40a6-a1ef-f823c3298675": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "e98c7b05-5381-4f63-850d-e5f09b989341": {
+              "deployed": false
+            },
+            "5bff8554-6757-4c36-98f8-d2529f52987c": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "d0a4962d-d1c0-43de-89bd-06f4f6cd74b1": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "058353bd-a9d8-4f17-8ce0-e85d9149ae3c": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "5b6c6b7a-20f0-4a5e-bbd4-4106b2e92863": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "0ad504f5-1287-46bd-9456-84a667dad619": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "6c2c9064-ce93-443c-b439-7c76a9821017": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "06249c97-88e0-4fb6-bd38-227a134ccaea": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "99ae512a-32ae-48c6-b73a-dcfcdb26c88a": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "5d459a14-6f96-40ba-91c2-fa401b9fa6d8": {
+              "deployed": false
+            },
+            "7f1241c4-ace0-4c47-9ae8-2ac1493cf931": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            }
+          }
+        },
+        {
+          "operatorId": "史都华德",
+          "cells": {
+            "8923aff8-a2d7-45c3-8da9-f86fb7de3121": {
+              "recruitType": "normal",
+              "elite": 1
+            }
+          }
+        },
+        {
+          "operatorId": "末药",
+          "cells": {
+            "63c09f0b-8a93-4098-b950-689d5f6dba5b": {
+              "recruitType": "normal",
+              "elite": 1
+            },
+            "e98c7b05-5381-4f63-850d-e5f09b989341": {
+              "deployed": true,
+              "skill": 1,
+              "used": true
+            },
+            "5bff8554-6757-4c36-98f8-d2529f52987c": {
+              "deployed": false
+            }
+          }
+        },
+        {
+          "operatorId": "崖心",
+          "cells": {
+            "bd3642d1-4261-4215-aca0-ca1000aeb32d": {
+              "recruitType": "temporary",
+              "elite": 1
+            },
+            "99ae512a-32ae-48c6-b73a-dcfcdb26c88a": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "5d459a14-6f96-40ba-91c2-fa401b9fa6d8": {
+              "deployed": false
+            }
+          }
+        },
+        {
+          "operatorId": "梅",
+          "cells": {
+            "c2afef51-e9d0-48d9-bd27-103ed18d4e72": {
+              "recruitType": "normal",
+              "elite": 1
+            }
+          }
+        },
+        {
+          "operatorId": "调香师",
+          "cells": {
+            "ef531c5e-3753-48d6-bd3b-1fe5f58f8187": {
+              "recruitType": "normal",
+              "elite": 1
+            }
+          }
+        },
+        {
+          "operatorId": "蛇屠箱",
+          "cells": {
+            "c33a6f2a-c2de-4bca-b628-e7df6b225d1a": {
+              "recruitType": "normal",
+              "elite": 1
+            }
+          }
+        },
+        {
+          "operatorId": "露托",
+          "cells": {
+            "dead3138-5900-45b3-a39b-dea3de261fe9": {
+              "recruitType": "normal",
+              "elite": 1
+            }
+          }
+        },
+        {
+          "operatorId": "琳琅诗怀雅",
+          "cells": {
+            "616d35f8-8b6d-49f0-b589-161c5ab86164": {
+              "recruitType": "normal",
+              "elite": 1
+            },
+            "e74ef613-92c1-40a6-a1ef-f823c3298675": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "e98c7b05-5381-4f63-850d-e5f09b989341": {
+              "deployed": true,
+              "skill": 1
+            },
+            "5bff8554-6757-4c36-98f8-d2529f52987c": {
+              "deployed": false
+            },
+            "c45b7a6d-42aa-41a2-a769-3de611c4c7d9": {
+              "promotionAfter": 2
+            },
+            "5d459a14-6f96-40ba-91c2-fa401b9fa6d8": {
+              "skill": 3,
+              "deployed": true,
+              "used": true
+            },
+            "7f1241c4-ace0-4c47-9ae8-2ac1493cf931": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            }
+          }
+        },
+        {
+          "operatorId": "深海色",
+          "cells": {
+            "616d35f8-8b6d-49f0-b589-161c5ab86164": {
+              "recruitType": "normal",
+              "elite": 1
+            }
+          }
+        },
+        {
+          "operatorId": "凯尔希·思衡托",
+          "cells": {
+            "968306eb-fa8d-48dc-85f6-01d0b770769d": {
+              "recruitType": "normal",
+              "elite": 1
+            },
+            "e74ef613-92c1-40a6-a1ef-f823c3298675": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "e98c7b05-5381-4f63-850d-e5f09b989341": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "5bff8554-6757-4c36-98f8-d2529f52987c": {
+              "deployed": false
+            },
+            "c45b7a6d-42aa-41a2-a769-3de611c4c7d9": {
+              "promotionAfter": 2
+            },
+            "5d459a14-6f96-40ba-91c2-fa401b9fa6d8": {
+              "skill": 2,
+              "deployed": true,
+              "used": true
+            },
+            "7f1241c4-ace0-4c47-9ae8-2ac1493cf931": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            }
+          }
+        },
+        {
+          "operatorId": "逻各斯",
+          "cells": {
+            "e74ef613-92c1-40a6-a1ef-f823c3298675": {
+              "recruitType": "normal",
+              "elite": 1
+            },
+            "e98c7b05-5381-4f63-850d-e5f09b989341": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "5bff8554-6757-4c36-98f8-d2529f52987c": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "d0a4962d-d1c0-43de-89bd-06f4f6cd74b1": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "058353bd-a9d8-4f17-8ce0-e85d9149ae3c": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "5b6c6b7a-20f0-4a5e-bbd4-4106b2e92863": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "0ad504f5-1287-46bd-9456-84a667dad619": {
+              "deployed": true,
+              "skill": 2,
+              "used": true
+            },
+            "6c2c9064-ce93-443c-b439-7c76a9821017": {
+              "deployed": true,
+              "skill": 2
+            },
+            "06249c97-88e0-4fb6-bd38-227a134ccaea": {
+              "deployed": false
+            },
+            "c45b7a6d-42aa-41a2-a769-3de611c4c7d9": {
+              "promotionAfter": 2
+            },
+            "5d459a14-6f96-40ba-91c2-fa401b9fa6d8": {
+              "skill": 3,
+              "deployed": true,
+              "used": true
+            },
+            "7f1241c4-ace0-4c47-9ae8-2ac1493cf931": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            }
+          }
+        },
+        {
+          "operatorId": "丰川祥子",
+          "cells": {
+            "e98c7b05-5381-4f63-850d-e5f09b989341": {
+              "recruitType": "normal",
+              "elite": 1
+            },
+            "c45b7a6d-42aa-41a2-a769-3de611c4c7d9": {
+              "promotionAfter": 2
+            },
+            "5d459a14-6f96-40ba-91c2-fa401b9fa6d8": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "7f1241c4-ace0-4c47-9ae8-2ac1493cf931": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            }
+          }
+        },
+        {
+          "operatorId": "褐果",
+          "cells": {
+            "e98c7b05-5381-4f63-850d-e5f09b989341": {
+              "recruitType": "normal",
+              "elite": 1
+            }
+          }
+        },
+        {
+          "operatorId": "PhonoR-0",
+          "cells": {
+            "5bff8554-6757-4c36-98f8-d2529f52987c": {
+              "recruitType": "normal",
+              "elite": 1
+            }
+          }
+        },
+        {
+          "operatorId": "苏苏洛",
+          "cells": {
+            "d0a4962d-d1c0-43de-89bd-06f4f6cd74b1": {
+              "recruitType": "normal",
+              "elite": 1
+            }
+          }
+        },
+        {
+          "operatorId": "波登可",
+          "cells": {
+            "058353bd-a9d8-4f17-8ce0-e85d9149ae3c": {
+              "recruitType": "normal",
+              "elite": 1
+            }
+          }
+        },
+        {
+          "operatorId": "卡达",
+          "cells": {
+            "5b6c6b7a-20f0-4a5e-bbd4-4106b2e92863": {
+              "recruitType": "normal",
+              "elite": 1
+            }
+          }
+        },
+        {
+          "operatorId": "霍尔海雅",
+          "cells": {
+            "0ad504f5-1287-46bd-9456-84a667dad619": {
+              "recruitType": "normal",
+              "elite": 1
+            },
+            "c45b7a6d-42aa-41a2-a769-3de611c4c7d9": {
+              "promotionAfter": 2
+            },
+            "5d459a14-6f96-40ba-91c2-fa401b9fa6d8": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            },
+            "7f1241c4-ace0-4c47-9ae8-2ac1493cf931": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            }
+          }
+        },
+        {
+          "operatorId": "嘉维尔",
+          "cells": {
+            "6c2c9064-ce93-443c-b439-7c76a9821017": {
+              "recruitType": "normal",
+              "elite": 1
+            }
+          }
+        },
+        {
+          "operatorId": "缇缇",
+          "cells": {
+            "06249c97-88e0-4fb6-bd38-227a134ccaea": {
+              "recruitType": "normal",
+              "elite": 1
+            },
+            "11a44f4c-636f-4435-9439-4da2e2feee94": {
+              "promotionAfter": 2
+            },
+            "99ae512a-32ae-48c6-b73a-dcfcdb26c88a": {
+              "deployed": true,
+              "skill": 3
+            },
+            "5d459a14-6f96-40ba-91c2-fa401b9fa6d8": {
+              "deployed": false
+            },
+            "7f1241c4-ace0-4c47-9ae8-2ac1493cf931": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            }
+          }
+        },
+        {
+          "operatorId": "可露希尔",
+          "cells": {
+            "11a44f4c-636f-4435-9439-4da2e2feee94": {
+              "recruitType": "normal",
+              "elite": 1
+            },
+            "99ae512a-32ae-48c6-b73a-dcfcdb26c88a": {
+              "deployed": true,
+              "skill": 2,
+              "used": true,
+              "promotionAfter": 2
+            },
+            "5d459a14-6f96-40ba-91c2-fa401b9fa6d8": {
+              "deployed": false
+            },
+            "7f1241c4-ace0-4c47-9ae8-2ac1493cf931": {
+              "deployed": true,
+              "skill": 3,
+              "used": true
+            }
+          }
+        },
+        {
+          "operatorId": "浊心斯卡蒂",
+          "cells": {
+            "99ae512a-32ae-48c6-b73a-dcfcdb26c88a": {
+              "recruitType": "normal",
+              "elite": 1
+            }
+          }
+        },
+        {
+          "operatorId": "艾丽妮",
+          "cells": {
+            "99ae512a-32ae-48c6-b73a-dcfcdb26c88a": {
+              "recruitType": "normal",
+              "elite": 1
+            }
+          }
+        },
+        {
+          "operatorId": "深靛",
+          "cells": {
+            "99ae512a-32ae-48c6-b73a-dcfcdb26c88a": {
+              "recruitType": "normal",
+              "elite": 1
+            }
+          }
+        },
+        {
+          "operatorId": "傀影",
+          "cells": {
+            "5d459a14-6f96-40ba-91c2-fa401b9fa6d8": {
+              "recruitType": "normal",
+              "elite": 1
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
