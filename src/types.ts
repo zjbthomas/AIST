@@ -7,6 +7,8 @@ export type TimelineNode = {
   floor: number;
   type: NodeType;
   stageId?: string;
+  prtsUrl?: string;
+  prtsUrls?: string[];
   categoryId?: string;
   categoryName?: string;
   sectionCode?: string;

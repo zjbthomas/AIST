@@ -304,6 +304,7 @@ function App() {
         id: uid(), floor, type: "combat" as const, stageId: stage.id,
         categoryId: stage.categoryId, categoryName: stage.categoryName,
         sectionCode: stage.sectionCode, sectionName: stage.sectionName,
+        prtsUrl: stage.prtsUrl, prtsUrls: stage.prtsUrls,
         name: stage.name,
       };
       const next = [...current.nodes];
@@ -515,7 +516,17 @@ function App() {
           <div className="node-actions">
             {node.stageId && (() => {
               const stage = stages.find((item) => item.id === node.stageId);
-              const links = stage?.prtsUrls?.length ? stage.prtsUrls : (stage?.prtsUrl ? [stage.prtsUrl] : []);
+              const links = node.prtsUrls?.length
+                ? node.prtsUrls
+                : node.prtsUrl
+                  ? [node.prtsUrl]
+                  : stage?.prtsUrls?.length
+                    ? stage.prtsUrls
+                    : stage?.prtsUrl
+                      ? [stage.prtsUrl]
+                      : node.name
+                        ? [`https://prts.wiki/w/${encodeURIComponent(node.name)}`]
+                        : [];
               return links.map((href, linkIndex) => <a key={`${href}-${linkIndex}`} href={href} target="_blank" rel="noreferrer" title={`在 PRTS 查看${links.length > 1 ? `变体 ${linkIndex + 1}` : "关卡"}`} className="node-stage-link"><ExternalLink size={14}/>{links.length > 1 && <small>{linkIndex + 1}</small>}</a>);
             })()}
             {node.type !== "initial" && !isPresetPreview && (
@@ -617,7 +628,7 @@ function NodeEditor({node,stages,otherNodeTypes,onSave,onClose}:{node:TimelineNo
     if(kind==="combat"){
       const stage=stages.find((item)=>item.id===stageId);
       if(!stage){window.alert("请选择一个作战关卡");return;}
-      onSave({id:node.id,floor:stage.floor||floor,type:"combat",stageId:stage.id,categoryId:stage.categoryId,categoryName:stage.categoryName,sectionCode:stage.sectionCode,sectionName:stage.sectionName,name:stage.name});
+      onSave({id:node.id,floor:stage.floor||floor,type:"combat",stageId:stage.id,prtsUrl:stage.prtsUrl,prtsUrls:stage.prtsUrls,categoryId:stage.categoryId,categoryName:stage.categoryName,sectionCode:stage.sectionCode,sectionName:stage.sectionName,name:stage.name});
       return;
     }
     const selected=otherNodeTypes.find((item)=>item.id===otherTypeId);

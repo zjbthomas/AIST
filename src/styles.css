@@ -317,3 +317,10 @@ td { font-size: 14px; }
 
 .node-stage-link { display: inline-flex; align-items: center; gap: 2px; }
 .node-stage-link small { font-size: 9px; line-height: 1; }
+
+/* Keep the post-node E2 marker separate from the avatar's top-right deploy badge. */
+.timeline-cell .promotion-after {
+  left: 5px;
+  right: auto;
+  top: 5px;
+}
