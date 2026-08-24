@@ -54,7 +54,7 @@ function requestWithHttps(url) {
   return new Promise((resolve, reject) => {
     const req = https.get(url, {
       family: 4,
-      timeout: 20_000,
+      timeout: 60_000,
       headers: {
         "User-Agent": "Arknights-IS-Tracker/0.3 (personal non-commercial tool)",
         Accept: "application/json",
@@ -72,7 +72,7 @@ function requestWithHttps(url) {
         catch (error) { reject(new Error(`Invalid JSON response: ${error.message}`)); }
       });
     });
-    req.on("timeout", () => req.destroy(new Error("HTTPS request timed out after 20 seconds")));
+    req.on("timeout", () => req.destroy(new Error("HTTPS request timed out after 60 seconds")));
     req.on("error", reject);
   });
 }

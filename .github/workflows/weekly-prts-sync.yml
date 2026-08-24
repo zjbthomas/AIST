@@ -29,6 +29,33 @@ jobs:
           node-version: 24
       - name: Install dependencies
         run: npm install
+      - name: Diagnose PRTS connectivity
+        shell: bash
+        run: |
+          echo "=== DNS ==="
+          getent ahosts prts.wiki || true
+
+          echo "=== curl HEAD ==="
+          curl -v --connect-timeout 20 --max-time 60 \
+            -I https://prts.wiki/api.php || true
+
+          echo "=== curl API ==="
+          curl -v --connect-timeout 20 --max-time 60 \
+            "https://prts.wiki/api.php?action=query&meta=siteinfo&format=json" || true
+
+          echo "=== Node ==="
+          node -e "
+            fetch('https://prts.wiki/api.php?action=query&meta=siteinfo&format=json')
+              .then(r => {
+                console.log('status:', r.status);
+                return r.text();
+              })
+              .then(t => console.log(t.slice(0, 300)))
+              .catch(e => {
+                console.error(e);
+                process.exitCode = 1;
+              });
+          " || true
       - name: Sync PRTS data
         run: npm run sync:prts
       - name: Cache PRTS images locally
