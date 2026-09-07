@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-08-31T18:11:25.576Z",
+  "updatedAt": "2026-09-07T16:39:16.633Z",
   "files": {
     "avatar:Castle-3": {
       "sourceUrl": "https://media.prts.wiki/8/82/%E5%A4%B4%E5%83%8F_Castle-3.png?v=5mhlw1ta2yop7hjtkh9zoxi7bwsfntl",
@@ -8214,6 +8214,72 @@
       "path": "assets/prts/skills/skill-b3e09d41515c428f-2-1574ac9c.png",
       "size": 12440,
       "updatedAt": "2026-08-04T06:16:54.889Z"
+    },
+    "skill:埃癸斯:1:启动狂宴模式": {
+      "sourceUrl": "https://media.prts.wiki/b/b5/%E6%8A%80%E8%83%BD_%E5%90%AF%E5%8A%A8%E7%8B%82%E5%AE%B4%E6%A8%A1%E5%BC%8F.png",
+      "path": "assets/prts/skills/skill-cebc39e47cbaeb25-1-fb10d18b.png",
+      "size": 31054,
+      "updatedAt": "2026-09-07T16:39:17.684Z"
+    },
+    "skill:岳羽由加莉:2:明镜止水": {
+      "sourceUrl": "https://media.prts.wiki/f/fc/%E6%8A%80%E8%83%BD_%E6%98%8E%E9%95%9C%E6%AD%A2%E6%B0%B4.png",
+      "path": "assets/prts/skills/skill-326a7f098b98a36f-2-8b404207.png",
+      "size": 30111,
+      "updatedAt": "2026-09-07T16:39:17.697Z"
+    },
+    "skill:岳羽由加莉:1:龙卷箭": {
+      "sourceUrl": "https://media.prts.wiki/9/97/%E6%8A%80%E8%83%BD_%E9%BE%99%E5%8D%B7%E7%AE%AD.png",
+      "path": "assets/prts/skills/skill-326a7f098b98a36f-1-08b847a3.png",
+      "size": 32334,
+      "updatedAt": "2026-09-07T16:39:17.704Z"
+    },
+    "skill:埃癸斯:2:全弹发射": {
+      "sourceUrl": "https://media.prts.wiki/d/d9/%E6%8A%80%E8%83%BD_%E5%85%A8%E5%BC%B9%E5%8F%91%E5%B0%84.png",
+      "path": "assets/prts/skills/skill-cebc39e47cbaeb25-2-fab5a9d2.png",
+      "size": 30127,
+      "updatedAt": "2026-09-07T16:39:17.717Z"
+    },
+    "avatar:岳羽由加莉": {
+      "sourceUrl": "https://media.prts.wiki/9/98/%E5%A4%B4%E5%83%8F_%E5%B2%B3%E7%BE%BD%E7%94%B1%E5%8A%A0%E8%8E%89.png?v=9yh4hrrlb8bj4qhossitlhikxygwnbp",
+      "path": "assets/prts/operators/operator-326a7f098b98a36f.png",
+      "size": 46608,
+      "updatedAt": "2026-09-07T16:39:17.801Z"
+    },
+    "avatar:埃癸斯": {
+      "sourceUrl": "https://media.prts.wiki/a/ae/%E5%A4%B4%E5%83%8F_%E5%9F%83%E7%99%B8%E6%96%AF.png?v=3yoiw2si9f3qzcytxjvmgyhnl3ytdu9",
+      "path": "assets/prts/operators/operator-cebc39e47cbaeb25.png",
+      "size": 53421,
+      "updatedAt": "2026-09-07T16:39:17.828Z"
+    },
+    "skill:结城理:1:俄耳甫斯的竖琴": {
+      "sourceUrl": "https://media.prts.wiki/6/6d/%E6%8A%80%E8%83%BD_%E4%BF%84%E8%80%B3%E7%94%AB%E6%96%AF%E7%9A%84%E7%AB%96%E7%90%B4.png",
+      "path": "assets/prts/skills/skill-c04d6742acbab90e-1-62441e2c.png",
+      "size": 32264,
+      "updatedAt": "2026-09-07T16:39:18.513Z"
+    },
+    "skill:结城理:3:开辟明日的剑刃": {
+      "sourceUrl": "https://media.prts.wiki/e/e2/%E6%8A%80%E8%83%BD_%E5%BC%80%E8%BE%9F%E6%98%8E%E6%97%A5%E7%9A%84%E5%89%91%E5%88%83.png",
+      "path": "assets/prts/skills/skill-c04d6742acbab90e-3-18cff303.png",
+      "size": 32897,
+      "updatedAt": "2026-09-07T16:39:18.515Z"
+    },
+    "skill:结城理:2:塔纳托斯的囚锁": {
+      "sourceUrl": "https://media.prts.wiki/4/42/%E6%8A%80%E8%83%BD_%E5%A1%94%E7%BA%B3%E6%89%98%E6%96%AF%E7%9A%84%E5%9B%9A%E9%94%81.png",
+      "path": "assets/prts/skills/skill-c04d6742acbab90e-2-d2e32345.png",
+      "size": 30246,
+      "updatedAt": "2026-09-07T16:39:18.585Z"
+    },
+    "avatar:结城理": {
+      "sourceUrl": "https://media.prts.wiki/5/54/%E5%A4%B4%E5%83%8F_%E7%BB%93%E5%9F%8E%E7%90%86.png?v=r5o7b0u1o0xb69x50ri68zja6htplr1",
+      "path": "assets/prts/operators/operator-c04d6742acbab90e.png",
+      "size": 51518,
+      "updatedAt": "2026-09-07T16:39:18.740Z"
+    },
+    "avatar:虎狼丸": {
+      "sourceUrl": "https://media.prts.wiki/5/56/%E5%A4%B4%E5%83%8F_%E8%99%8E%E7%8B%BC%E4%B8%B8.png?v=hpf6935nhoel6hn59wz4o70kpokki4h",
+      "path": "assets/prts/operators/operator-e3bb4a9631a851e8.png",
+      "size": 47875,
+      "updatedAt": "2026-09-07T16:39:18.882Z"
     }
   }
 }
