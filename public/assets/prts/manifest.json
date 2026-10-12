@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-28T18:42:46.947Z",
+  "updatedAt": "2026-10-12T20:23:17.533Z",
   "files": {
     "avatar:Castle-3": {
       "sourceUrl": "https://media.prts.wiki/8/82/%E5%A4%B4%E5%83%8F_Castle-3.png?v=5mhlw1ta2yop7hjtkh9zoxi7bwsfntl",
@@ -8280,6 +8280,66 @@
       "path": "assets/prts/operators/operator-e3bb4a9631a851e8.png",
       "size": 47875,
       "updatedAt": "2026-09-07T16:39:18.882Z"
+    },
+    "skill:克莱门莎:1:冲蚀": {
+      "sourceUrl": "https://media.prts.wiki/3/34/%E6%8A%80%E8%83%BD_%E5%86%B2%E8%9A%80.png",
+      "path": "assets/prts/skills/skill-49d264359c6af9f8-1-4ac429e8.png",
+      "size": 19847,
+      "updatedAt": "2026-10-12T20:23:18.852Z"
+    },
+    "skill:克莱门莎:3:与海为敌": {
+      "sourceUrl": "https://media.prts.wiki/7/7c/%E6%8A%80%E8%83%BD_%E4%B8%8E%E6%B5%B7%E4%B8%BA%E6%95%8C.png",
+      "path": "assets/prts/skills/skill-49d264359c6af9f8-3-e71ee077.png",
+      "size": 28112,
+      "updatedAt": "2026-10-12T20:23:18.866Z"
+    },
+    "skill:克莱门莎:2:风暴潮": {
+      "sourceUrl": "https://media.prts.wiki/7/70/%E6%8A%80%E8%83%BD_%E9%A3%8E%E6%9A%B4%E6%BD%AE.png",
+      "path": "assets/prts/skills/skill-49d264359c6af9f8-2-ba228a34.png",
+      "size": 25967,
+      "updatedAt": "2026-10-12T20:23:18.884Z"
+    },
+    "skill:德·托莱多:1:以假乱真": {
+      "sourceUrl": "https://media.prts.wiki/8/8e/%E6%8A%80%E8%83%BD_%E4%BB%A5%E5%81%87%E4%B9%B1%E7%9C%9F.png",
+      "path": "assets/prts/skills/skill-e2f69cbd9bd5f068-1-fb2c7727.png",
+      "size": 18321,
+      "updatedAt": "2026-10-12T20:23:19.025Z"
+    },
+    "avatar:德·托莱多": {
+      "sourceUrl": "https://media.prts.wiki/1/16/%E5%A4%B4%E5%83%8F_%E5%BE%B7%C2%B7%E6%89%98%E8%8E%B1%E5%A4%9A.png?v=8i34kz2d8hvt4cxolxog4lhkhkffzuu",
+      "path": "assets/prts/operators/operator-e2f69cbd9bd5f068.png",
+      "size": 65330,
+      "updatedAt": "2026-10-12T20:23:19.057Z"
+    },
+    "avatar:克莱门莎": {
+      "sourceUrl": "https://media.prts.wiki/3/34/%E5%A4%B4%E5%83%8F_%E5%85%8B%E8%8E%B1%E9%97%A8%E8%8E%8E.png?v=l9ke19kzbbk5lp65eipyhdlxgbkd8gd",
+      "path": "assets/prts/operators/operator-49d264359c6af9f8.png",
+      "size": 60030,
+      "updatedAt": "2026-10-12T20:23:19.070Z"
+    },
+    "skill:旅骨:1:触礁": {
+      "sourceUrl": "https://media.prts.wiki/6/6f/%E6%8A%80%E8%83%BD_%E8%A7%A6%E7%A4%81.png",
+      "path": "assets/prts/skills/skill-65f783a814bd135b-1-cc0323e4.png",
+      "size": 15751,
+      "updatedAt": "2026-10-12T20:23:20.086Z"
+    },
+    "skill:德·托莱多:2:危言耸听": {
+      "sourceUrl": "https://media.prts.wiki/b/b6/%E6%8A%80%E8%83%BD_%E5%8D%B1%E8%A8%80%E8%80%B8%E5%90%AC.png",
+      "path": "assets/prts/skills/skill-e2f69cbd9bd5f068-2-ca0eca5e.png",
+      "size": 19431,
+      "updatedAt": "2026-10-12T20:23:20.149Z"
+    },
+    "skill:旅骨:2:座浅": {
+      "sourceUrl": "https://media.prts.wiki/0/0e/%E6%8A%80%E8%83%BD_%E5%BA%A7%E6%B5%85.png",
+      "path": "assets/prts/skills/skill-65f783a814bd135b-2-93c66731.png",
+      "size": 21550,
+      "updatedAt": "2026-10-12T20:23:20.192Z"
+    },
+    "avatar:旅骨": {
+      "sourceUrl": "https://media.prts.wiki/2/29/%E5%A4%B4%E5%83%8F_%E6%97%85%E9%AA%A8.png?v=1beqeaf3krevolqtq1rc1cbpoovxxjk",
+      "path": "assets/prts/operators/operator-65f783a814bd135b.png",
+      "size": 69191,
+      "updatedAt": "2026-10-12T20:23:20.318Z"
     }
   }
 }
