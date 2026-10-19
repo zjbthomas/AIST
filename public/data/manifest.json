@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-12T20:23:17.341Z",
+  "updatedAt": "2026-10-19T17:39:25.288Z",
   "source": "https://prts.wiki/api.php",
   "operatorMeta": {
     "count": 434,
@@ -7,14 +7,14 @@
     "revid": 439147
   },
   "stageMeta": {
-    "count": 633,
+    "count": 657,
     "byTheme": {
       "傀影与猩红孤钻": 90,
       "水月与深蓝之树": 97,
       "探索者的银凇止境": 100,
       "萨卡兹的无终奇语": 120,
       "岁的界园志异": 128,
-      "沉沦者的黑流树海": 98
+      "沉沦者的黑流树海": 122
     },
     "categoriesByTheme": {
       "傀影与猩红孤钻": [
@@ -264,21 +264,21 @@
           "sectionCode": "ISW-NO",
           "sectionName": "一般作战 & 紧急作战",
           "name": "一般作战",
-          "count": 32
+          "count": 41
         },
         {
           "id": "ISW-NO:emergency:一般作战 & 紧急作战",
           "sectionCode": "ISW-NO",
           "sectionName": "一般作战 & 紧急作战",
           "name": "紧急作战",
-          "count": 32
+          "count": 41
         },
         {
           "id": "ISW-NO & ISW-DF:default:险路恶敌",
           "sectionCode": "ISW-NO & ISW-DF",
           "sectionName": "险路恶敌",
           "name": "险路恶敌",
-          "count": 11
+          "count": 14
         },
         {
           "id": "ISW-NO:default:鸭爵与雇员",
@@ -299,7 +299,7 @@
           "sectionCode": "ISW-NO",
           "sectionName": "特殊挑战",
           "name": "特殊挑战",
-          "count": 2
+          "count": 3
         },
         {
           "id": "ISW-NO:default:流窜“居民” & “居民”据点",
@@ -320,17 +320,17 @@
           "sectionCode": "ISW-NO & ISW-DF",
           "sectionName": "追猎",
           "name": "追猎",
-          "count": 9
+          "count": 11
         }
       ]
     },
     "revisions": {
-      "傀影与猩红孤钻": 440803,
-      "水月与深蓝之树": 431166,
-      "探索者的银凇止境": 431095,
-      "萨卡兹的无终奇语": 432748,
-      "岁的界园志异": 432729,
-      "沉沦者的黑流树海": 433770
+      "傀影与猩红孤钻": 441591,
+      "水月与深蓝之树": 441598,
+      "探索者的银凇止境": 441605,
+      "萨卡兹的无终奇语": 441199,
+      "岁的界园志异": 441542,
+      "沉沦者的黑流树海": 441984
     }
   },
   "nodeTypeMeta": {
@@ -345,14 +345,14 @@
     }
   },
   "squadMeta": {
-    "count": 95,
+    "count": 98,
     "byTheme": {
       "傀影与猩红孤钻": 10,
       "水月与深蓝之树": 14,
       "探索者的银凇止境": 15,
       "萨卡兹的无终奇语": 20,
       "岁的界园志异": 21,
-      "沉沦者的黑流树海": 15
+      "沉沦者的黑流树海": 18
     }
   }
 }

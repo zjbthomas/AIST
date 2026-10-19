@@ -246,21 +246,21 @@
       "sectionCode": "ISW-NO",
       "sectionName": "一般作战 & 紧急作战",
       "name": "一般作战",
-      "count": 32
+      "count": 41
     },
     {
       "id": "ISW-NO:emergency:一般作战 & 紧急作战",
       "sectionCode": "ISW-NO",
       "sectionName": "一般作战 & 紧急作战",
       "name": "紧急作战",
-      "count": 32
+      "count": 41
     },
     {
       "id": "ISW-NO & ISW-DF:default:险路恶敌",
       "sectionCode": "ISW-NO & ISW-DF",
       "sectionName": "险路恶敌",
       "name": "险路恶敌",
-      "count": 11
+      "count": 14
     },
     {
       "id": "ISW-NO:default:鸭爵与雇员",
@@ -281,7 +281,7 @@
       "sectionCode": "ISW-NO",
       "sectionName": "特殊挑战",
       "name": "特殊挑战",
-      "count": 2
+      "count": 3
     },
     {
       "id": "ISW-NO:default:流窜“居民” & “居民”据点",
@@ -302,7 +302,7 @@
       "sectionCode": "ISW-NO & ISW-DF",
       "sectionName": "追猎",
       "name": "追猎",
-      "count": 9
+      "count": 11
     }
   ]
 }
