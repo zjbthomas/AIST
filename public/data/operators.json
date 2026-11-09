@@ -183,6 +183,23 @@
     "avatarSource": "https://media.prts.wiki/d/d6/%E5%A4%B4%E5%83%8F_W.png?v=1pejgrnwpioapuod7nlh84k6uhdafwd"
   },
   {
+    "id": "“暴躁铁皮”",
+    "name": "“暴躁铁皮”",
+    "rarity": 6,
+    "profession": "DEFENDER",
+    "avatar": "assets/prts/operators/operator-a93aa713ad3575b9.png",
+    "skills": [
+      {
+        "index": 1,
+        "name": "大丑的愤怒",
+        "icon": "https://media.prts.wiki/9/9b/%E6%8A%80%E8%83%BD_%E5%A4%A7%E4%B8%91%E7%9A%84%E6%84%A4%E6%80%92.png"
+      }
+    ],
+    "prtsUrl": "https://prts.wiki/w/%E2%80%9C%E6%9A%B4%E8%BA%81%E9%93%81%E7%9A%AE%E2%80%9D",
+    "revid": 449198,
+    "avatarSource": "https://media.prts.wiki/c/cf/%E5%A4%B4%E5%83%8F_%E2%80%9C%E6%9A%B4%E8%BA%81%E9%93%81%E7%9A%AE%E2%80%9D.png?v=mytdhtij4g6i965lyjfjjid7046dohb"
+  },
+  {
     "id": "万顷",
     "name": "万顷",
     "rarity": 5,
@@ -707,7 +724,7 @@
       }
     ],
     "prtsUrl": "https://prts.wiki/w/%E4%BD%86%E4%B9%A6",
-    "revid": 446410,
+    "revid": 448574,
     "avatarSource": "https://media.prts.wiki/b/b0/%E5%A4%B4%E5%83%8F_%E4%BD%86%E4%B9%A6.png?v=ccbmeu33cpvrt8a0fcwdzyq4rp1prie"
   },
   {
@@ -1031,7 +1048,7 @@
       }
     ],
     "prtsUrl": "https://prts.wiki/w/%E5%86%BB%E6%B2%B3",
-    "revid": 447330,
+    "revid": 448193,
     "avatarSource": "https://media.prts.wiki/f/f4/%E5%A4%B4%E5%83%8F_%E5%86%BB%E6%B2%B3.png?v=m2d16mw7znouj676j6tufnn93h3i0kj"
   },
   {
@@ -1085,7 +1102,7 @@
       }
     ],
     "prtsUrl": "https://prts.wiki/w/%E5%87%9B%E5%BE%A1%E9%93%B6%E7%81%B0",
-    "revid": 447210,
+    "revid": 448231,
     "avatarSource": "https://media.prts.wiki/3/3d/%E5%A4%B4%E5%83%8F_%E5%87%9B%E5%BE%A1%E9%93%B6%E7%81%B0.png?v=7p8rcgzgto0sdnd0p3l03jwb7d0e8ph"
   },
   {
@@ -1169,7 +1186,7 @@
       }
     ],
     "prtsUrl": "https://prts.wiki/w/%E5%87%AF%E5%B0%94%E5%B8%8C%C2%B7%E6%80%9D%E8%A1%A1%E6%89%98",
-    "revid": 446494,
+    "revid": 448412,
     "avatarSource": "https://media.prts.wiki/5/57/%E5%A4%B4%E5%83%8F_%E5%87%AF%E5%B0%94%E5%B8%8C%C2%B7%E6%80%9D%E8%A1%A1%E6%89%98.png?v=ij1gg0ae1ldnbtnlwwd5pj0skt6av3i"
   },
   {
@@ -2207,7 +2224,7 @@
       }
     ],
     "prtsUrl": "https://prts.wiki/w/%E5%A1%94%E9%9C%B2%E6%8B%89",
-    "revid": 447391,
+    "revid": 449163,
     "avatarSource": "https://media.prts.wiki/c/cb/%E5%A4%B4%E5%83%8F_%E5%A1%94%E9%9C%B2%E6%8B%89.png?v=93yhq342id7fj65mjfpq7jqeuagkpwx"
   },
   {
@@ -3627,7 +3644,7 @@
       }
     ],
     "prtsUrl": "https://prts.wiki/w/%E6%85%91%E7%A0%82",
-    "revid": 446586,
+    "revid": 447824,
     "avatarSource": "https://media.prts.wiki/e/e7/%E5%A4%B4%E5%83%8F_%E6%85%91%E7%A0%82.png?v=9b6hl6to8qi7arqvfxyo2q85ej95o9x"
   },
   {
@@ -4581,7 +4598,7 @@
       }
     ],
     "prtsUrl": "https://prts.wiki/w/%E6%9C%9B",
-    "revid": 446680,
+    "revid": 448420,
     "avatarSource": "https://media.prts.wiki/3/38/%E5%A4%B4%E5%83%8F_%E6%9C%9B.png?v=fm2pj4t4ktr61durtw3tzh8hc9lkx9d"
   },
   {
@@ -5246,7 +5263,7 @@
       }
     ],
     "prtsUrl": "https://prts.wiki/w/%E6%AD%A2%E9%A2%82",
-    "revid": 446741,
+    "revid": 448065,
     "avatarSource": "https://media.prts.wiki/7/72/%E5%A4%B4%E5%83%8F_%E6%AD%A2%E9%A2%82.png?v=24rif1j3epjeafzc92zmvei2lvyl5ej"
   },
   {
@@ -6762,7 +6779,7 @@
       }
     ],
     "prtsUrl": "https://prts.wiki/w/%E7%8F%8A%E6%AF%94",
-    "revid": 446600,
+    "revid": 448488,
     "avatarSource": "https://media.prts.wiki/0/0c/%E5%A4%B4%E5%83%8F_%E7%8F%8A%E6%AF%94.png?v=3rakuwtog018648m3lcsfvi1zmph5vd"
   },
   {
@@ -8045,7 +8062,7 @@
       }
     ],
     "prtsUrl": "https://prts.wiki/w/%E8%83%BD%E5%A4%A9%E4%BD%BF",
-    "revid": 446603,
+    "revid": 448572,
     "avatarSource": "https://media.prts.wiki/a/ad/%E5%A4%B4%E5%83%8F_%E8%83%BD%E5%A4%A9%E4%BD%BF.png?v=6oajxz9unrq9putp88cfdgqbtlz8rzj"
   },
   {
@@ -8579,7 +8596,7 @@
       }
     ],
     "prtsUrl": "https://prts.wiki/w/%E8%8F%B2%E4%BA%9A%E6%A2%85%E5%A1%94",
-    "revid": 446434,
+    "revid": 448827,
     "avatarSource": "https://media.prts.wiki/b/b8/%E5%A4%B4%E5%83%8F_%E8%8F%B2%E4%BA%9A%E6%A2%85%E5%A1%94.png?v=37bxp4ulnsp9p6p2uyaaww26ewm4js2"
   },
   {
@@ -8866,7 +8883,7 @@
       }
     ],
     "prtsUrl": "https://prts.wiki/w/%E8%A1%8C%E7%AE%B8",
-    "revid": 446696,
+    "revid": 448569,
     "avatarSource": "https://media.prts.wiki/4/42/%E5%A4%B4%E5%83%8F_%E8%A1%8C%E7%AE%B8.png?v=8neueyfiad8s8ucrphru3hedxaav1w5"
   },
   {
@@ -9400,7 +9417,7 @@
       }
     ],
     "prtsUrl": "https://prts.wiki/w/%E8%B5%AB%E6%8B%89%E6%A0%BC",
-    "revid": 447123,
+    "revid": 448531,
     "avatarSource": "https://media.prts.wiki/c/cd/%E5%A4%B4%E5%83%8F_%E8%B5%AB%E6%8B%89%E6%A0%BC.png?v=eos6psef9203hdduccx0t8legweizrg"
   },
   {
@@ -9580,7 +9597,7 @@
       }
     ],
     "prtsUrl": "https://prts.wiki/w/%E8%BF%B7%E8%BF%AD%E9%A6%99",
-    "revid": 446566,
+    "revid": 448575,
     "avatarSource": "https://media.prts.wiki/3/3b/%E5%A4%B4%E5%83%8F_%E8%BF%B7%E8%BF%AD%E9%A6%99.png?v=66djrrwric5g0dfuswhriarag1xw3bv"
   },
   {
@@ -10402,7 +10419,7 @@
       }
     ],
     "prtsUrl": "https://prts.wiki/w/%E9%9A%90%E7%8E%B0",
-    "revid": 446731,
+    "revid": 448573,
     "avatarSource": "https://media.prts.wiki/8/85/%E5%A4%B4%E5%83%8F_%E9%9A%90%E7%8E%B0.png?v=lpkhj45rbw2pqttsp855b6c3s6on0r2"
   },
   {

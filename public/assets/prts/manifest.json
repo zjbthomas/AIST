@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-02T20:54:01.805Z",
+  "updatedAt": "2026-11-09T21:34:45.102Z",
   "files": {
     "avatar:Castle-3": {
       "sourceUrl": "https://media.prts.wiki/8/82/%E5%A4%B4%E5%83%8F_Castle-3.png?v=5mhlw1ta2yop7hjtkh9zoxi7bwsfntl",
@@ -8466,6 +8466,12 @@
       "path": "assets/prts/skills/skill-e2db3e9877a9d126-1-c11e04bb.png",
       "size": 28056,
       "updatedAt": "2026-11-02T20:54:07.336Z"
+    },
+    "avatar:“暴躁铁皮”": {
+      "sourceUrl": "https://media.prts.wiki/c/cf/%E5%A4%B4%E5%83%8F_%E2%80%9C%E6%9A%B4%E8%BA%81%E9%93%81%E7%9A%AE%E2%80%9D.png?v=mytdhtij4g6i965lyjfjjid7046dohb",
+      "path": "assets/prts/operators/operator-a93aa713ad3575b9.png",
+      "size": 37672,
+      "updatedAt": "2026-11-09T21:35:52.422Z"
     }
   }
 }
