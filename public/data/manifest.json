@@ -1,9 +1,9 @@
 {
-  "updatedAt": "2026-11-09T21:34:44.927Z",
+  "updatedAt": "2026-11-16T21:09:38.557Z",
   "source": "https://prts.wiki/api.php",
   "operatorMeta": {
-    "count": 441,
-    "avatarCount": 441,
+    "count": 440,
+    "avatarCount": 440,
     "revid": 439147
   },
   "stageMeta": {
@@ -330,7 +330,7 @@
       "探索者的银凇止境": 444298,
       "萨卡兹的无终奇语": 441199,
       "岁的界园志异": 442918,
-      "沉沦者的黑流树海": 448393
+      "沉沦者的黑流树海": 450683
     }
   },
   "nodeTypeMeta": {
